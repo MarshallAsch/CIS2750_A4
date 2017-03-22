@@ -15,11 +15,12 @@ static PyObject* genResult_streams(SQL_result* result);
 static PyObject* genResult_posts(SQL_result* result);
 
 
-void initdbWrapper();
+//void initdbWrapper();
 
 
 
 /* the list of the functions */
+/*
 static PyMethodDef module_method_getStreams[] =
 {
 	{ "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
@@ -31,15 +32,42 @@ static PyMethodDef module_method_getPosts[] =
 	{ "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
 	{ NULL, NULL, 0, NULL }
 };
+*/
+
+
+static PyMethodDef dbwrapper_funcs[] =
+{
+	{ "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
+	{ "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
+	{ NULL, NULL, 0, NULL }
+};
 
 
 
+static struct PyModuleDef db_module =
+{
+	PyModuleDef_HEAD_INIT,
+	"dbwrapper",
+	NULL,
+	-1,
+	dbwrapper_funcs
+};
+
+
+
+PyMODINIT_FUNC PyInit_dbWrapper(void)
+{
+	Py_Initialize();
+	return PyModule_Create(&db_module);
+}
+
+/*
 void initdbWrapper()
 {
 	Py_InitModule3("getUsersStreams", module_method_getStreams, "");
 	Py_InitModule3("getStreamPosts", module_method_getPosts, "");
 }
-
+*/
 
 
 
