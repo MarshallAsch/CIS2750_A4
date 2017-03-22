@@ -11,7 +11,7 @@ MYSQL* initSQL()
 	mysql = NULL;
 
 	/* initilize the connection */
-	mysql_init(mysql);
+	mysql = mysql_init(mysql);
 	mysql_options(mysql, MYSQL_READ_DEFAULT_GROUP, "mydb");
 
 	if (!mysql_real_connect(mysql, HOSTNAME, USERNAME, PASSWORD, DATABASE, 0, NULL, 0))

@@ -302,17 +302,17 @@ int createAllTables(MYSQL* mysql)
 	}
 
 	/* create the data lists */
-	char* namesUsers[] = {"ID", "user_id", "stream_name", "num_read"};
-	char* typesUsers[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "TEXT", "INT"};
+	char* namesUsers[] = {"user_id", "stream_name", "num_read"};
+	char* typesUsers[] = {"TEXT", "TEXT", "INT"};
 
-	char* namesStreams[] = {"ID", "stream_name", "num_posts"};
-	char* typesStreams[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "INT"};
+	char* namesStreams[] = {"stream_name", "num_posts"};
+	char* typesStreams[] = {"TEXT", "INT"};
 
-	char* namesPosts[] = {"ID", "stream_name", "user_id", "date", "text"};
-	char* typesPosts[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "TEXT", "DATETIME", "TEXT"};
+	char* namesPosts[] = {"stream_name", "user_id", "date", "text"};
+	char* typesPosts[] = {"TEXT", "TEXT", "DATETIME", "TEXT"};
 
 	/* try to create the users table */
-	status = createTable(mysql, "users", 4, namesUsers, typesUsers);
+	status = createTable(mysql, "users", 3, namesUsers, typesUsers);
 	if (status != 0)
 	{
 		printf("Failed to create the users table.\n");
@@ -320,7 +320,7 @@ int createAllTables(MYSQL* mysql)
 	}
 
 	/* try to create the posts table */
-	status = createTable(mysql, "posts", 5, namesPosts, typesPosts);
+	status = createTable(mysql, "posts", 4, namesPosts, typesPosts);
 	if (status != 0)
 	{
 		printf("Failed to create the posts table.\n");
@@ -328,7 +328,7 @@ int createAllTables(MYSQL* mysql)
 	}
 
 	/* try to create the streams table */
-	status = createTable(mysql, "streams", 3, namesStreams, typesStreams);
+	status = createTable(mysql, "streams", 2, namesStreams, typesStreams);
 	if (status != 0)
 	{
 		printf("Failed to create the streams table.\n");

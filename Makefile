@@ -41,7 +41,7 @@ db: lib out $(db_OBJ) $(LIBRARIES)
 out/db.o: db.c
 	$(CC) $(CFLAG) $< -o $@
 
-out/dbAccess.o: dbAccess.c
+out/dbAccess.o: dbAccess.c dbAccess.h
 	$(CC) $(CFLAG) $< -o $@
 
 
