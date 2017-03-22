@@ -55,7 +55,7 @@ static struct PyModuleDef db_module =
 
 
 
-PyMODINIT_FUNC PyInit_dbWrapper(void)
+PyMODINIT_FUNC PyInit_dbwrapper(void)
 {
 	Py_Initialize();
 	return PyModule_Create(&db_module);

@@ -9,7 +9,7 @@ db_OBJ = out/db.o out/dbAccess.o
 
 LIBS = -Llib -lmystr -lstream
 CC = gcc
-CFLAG =  -c -Wall -ansi -g
+CFLAG =  -c -Wall -ansi -g -fPIC
 LFLAG = -lc -lm -lmysqlclient $(LIBS)
 
 
@@ -17,6 +17,7 @@ LFLAG = -lc -lm -lmysqlclient $(LIBS)
 all: db post addauthor genHTML auth removeauthor
 	chmod +x setup.py
 	./setup.py build
+	cp build/lib.*/*.so .
 	chmod +x view.py
 	chmod +x loadStreams.py
 	chmod +x markOne.py
@@ -216,6 +217,7 @@ clean:
 	rm -f auth
 	rm -f removeauthor
 	rm -f db
+	rm -f *.so
 
 
 destroy:
