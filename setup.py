@@ -4,4 +4,4 @@
 
 from distutils.core import setup, Extension
 setup(name='dbwrapper', version='1.0',  \
-      ext_modules=[Extension('dbwrapper', sources = ['dbWrapper.c'], libraries = ['mystr'], extra_objects = ["out/dbAccess.o"], libraries = ['mystr', "mysqlclient"], library_dirs = ["lib"])])
+      ext_modules=[Extension('dbwrapper', sources = ['dbWrapper.c'], extra_objects = ["out/dbAccess.o"], libraries = ['mystr', "mysqlclient"], library_dirs = ["lib"])])

@@ -15,30 +15,14 @@ static PyObject* genResult_streams(SQL_result* result);
 static PyObject* genResult_posts(SQL_result* result);
 
 
-//void initdbWrapper();
 
 
-
-/* the list of the functions */
-/*
-static PyMethodDef module_method_getStreams[] =
-{
-	{ "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
-	{ NULL, NULL, 0, NULL }
-};
-
-static PyMethodDef module_method_getPosts[] =
-{
-	{ "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
-	{ NULL, NULL, 0, NULL }
-};
-*/
 
 
 static PyMethodDef dbwrapper_funcs[] =
 {
-	{ "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
-	{ "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
+	{ "getStreamPosts", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
+	{ "getUsersStreams", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
 	{ NULL, NULL, 0, NULL }
 };
 
@@ -61,15 +45,6 @@ PyMODINIT_FUNC PyInit_dbwrapper(void)
 	return PyModule_Create(&db_module);
 }
 
-/*
-void initdbWrapper()
-{
-	Py_InitModule3("getUsersStreams", module_method_getStreams, "");
-	Py_InitModule3("getStreamPosts", module_method_getPosts, "");
-}
-*/
-
-
 
 
 static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
@@ -80,7 +55,7 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 
 	userID = NULL;
 
-	if (PyArg_ParseTuple(args, "s", userID) == 0)
+	if (PyArg_ParseTuple(args, "s", &userID) == 0)
 	{
 		return NULL;
 	}
@@ -104,7 +79,7 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 
 	stream = NULL;
 
-	if (PyArg_ParseTuple(args, "s", stream) == 0)
+	if (PyArg_ParseTuple(args, "s", &stream) == 0)
 	{
 		return NULL;
 	}
