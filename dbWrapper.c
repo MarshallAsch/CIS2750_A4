@@ -15,7 +15,7 @@ static PyObject* genResult_streams(SQL_result* result);
 static PyObject* genResult_posts(SQL_result* result);
 
 
-PyMODINIT_FUNC initdbWrapper();
+void initdbWrapper();
 
 
 
@@ -34,7 +34,7 @@ static PyMethodDef module_method_getPosts[] =
 
 
 
-PyMODINIT_FUNC initdbWrapper()
+void initdbWrapper()
 {
 	Py_InitModule3("getUsersStreams", module_method_getStreams, "");
 	Py_InitModule3("getStreamPosts", module_method_getPosts, "");
@@ -50,6 +50,7 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	SQL_result* result;
 	char* userID;
 
+	userID = NULL;
 
 	if (PyArg_ParseTuple(args, "s", userID) == 0)
 	{
@@ -59,9 +60,9 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* get the data */
-	result = getUserStreams(mysql, userID)
+	result = getUserStreams(mysql, userID);
 
-	         mysql_close(&mysql);
+	mysql_close(mysql);
 
 
 	return genResult_streams(result);
@@ -73,6 +74,7 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	SQL_result* result;
 	char* stream;
 
+	stream = NULL;
 
 	if (PyArg_ParseTuple(args, "s", stream) == 0)
 	{
@@ -82,9 +84,9 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* get the data */
-	result = getStreamPosts(mysql, stream)
+	result = getStreamPosts(mysql, stream);
 
-	         mysql_close(&mysql);
+	mysql_close(mysql);
 
 
 	return genResult_posts(result);
@@ -101,12 +103,11 @@ static PyObject* genResult_streams(SQL_result* result)
 	int i;
 	SQL_users_result* users;
 	PyObject* obj;
-
 	PyObject* list;
 
 	if (result == NULL)
 	{
-		return Py_RETURN_NONE;
+		Py_RETURN_NONE;
 	}
 
 	list = PyList_New(result->numRows);
@@ -118,7 +119,7 @@ static PyObject* genResult_streams(SQL_result* result)
 		obj = Py_BuildValue("issi", users->id, users->user_id, users->stream_name, users->num_read);
 		freeUserResults(users);
 
-		PyList_SetItem(list, obj);
+		PyList_SetItem(list, i, obj);
 	}
 
 	/* create the result structure */
@@ -135,12 +136,12 @@ static PyObject* genResult_posts(SQL_result* result)
 	int i;
 	SQL_post_result* post;
 	PyObject* obj;
-
 	PyObject* list;
+
 
 	if (result == NULL)
 	{
-		return Py_RETURN_NONE;
+		Py_RETURN_NONE;
 	}
 
 	list = PyList_New(result->numRows);
@@ -152,7 +153,7 @@ static PyObject* genResult_posts(SQL_result* result)
 		obj = Py_BuildValue("issss", post->id, post->stream_name, post->user_id, post->date, post->text);
 
 		freePostResults(post);
-		PyList_SetItem(list, obj);
+		PyList_SetItem(list, i, obj);
 	}
 
 	/* create the result structure */

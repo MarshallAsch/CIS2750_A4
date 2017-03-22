@@ -4,4 +4,4 @@
 
 from distutils.core import setup, Extension
 setup(name='dbAccess', version='1.0',  \
-      ext_modules=[Extension('dbAccess', ['dbAccess.c'])])
+      ext_modules=[Extension('dbAccess', ['dbAccess.c', 'dbWrapper.c'])])
