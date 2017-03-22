@@ -5,6 +5,7 @@
 #include <mysql/mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "mystring.h"
 
 
@@ -55,7 +56,7 @@ typedef struct SQL_streams_result
 {
 	int id;
 	char* stream_name;
-	int num_posts;	
+	int num_posts;
 } SQL_streams_result;
 
 
@@ -80,11 +81,11 @@ void error(char* msg, MYSQL* mysql);
 
 ********************/
 
-SQL_users_result* new newUserResult(char* id, char* userID, char* stream, char* numRead);
+SQL_users_result* newUserResult(char* id, char* userID, char* stream, char* numRead);
 
-SQL_streams_result* new newStreamResult(char* id, char* stream, char* numPosts);
+SQL_streams_result* newStreamResult(char* id, char* stream, char* numPosts);
 
-SQL_post_result* new newPostResult(char* id, char* userID, char* stream, char* date, char* text);
+SQL_post_result* newPostResult(char* id, char* userID, char* stream, char* date, char* text);
 
 SQL_result* newResult(int numRows, int numFields);
 

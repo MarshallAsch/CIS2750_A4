@@ -1,3 +1,12 @@
+/****************************** db.c ***********************************
+Student Name: Marshall Aaron Asch		             Student Number:  0928357
+Date: March 22, 2017                  	Course Name: CIS*2750
+Assignment: A4
+
+	description
+****************************************************************************/
+
+
 /*
 tables:
 	users (ID userName streamName numRead)
@@ -11,7 +20,9 @@ tables:
 #include <mysql/mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "mystring.h"
+#include "dbAccess.h"
 
 
 
@@ -19,21 +30,104 @@ tables:
 int printUsers(MYSQL* mysql);
 int printStreams(MYSQL* mysql);
 int printposts(MYSQL* mysql);
+int clearAll(MYSQL* mysql);
+int deleteAll(MYSQL* mysql);
+int createAllTables(MYSQL* mysql);
 
-void usage();
 
+static void usage();
+static char parseOption(const char* option);
 
 int main(int argc, char const *argv[])
 {
 	MYSQL* mysql;
 
+	/* make sure the num arguments are correct */
+	if (argc != 2)
+	{
+		usage();
+		return -1;
+	}
+
+
+	/* initilize connection to the database */
 	mysql = initSQL();
 
 
+	switch (parseOption(argv[1]))
+	{
+	case 'c':
+		clearAll(mysql);
+		break;
+	case 'r':
+		deleteAll(mysql);
+		break;
+	case 'p':
+		printposts(mysql);
+		break;
+	case 'u':
+		printUsers(mysql);
+		break;
+	case 's':
+		printStreams(mysql);
+		break;
+	case 'i':
+		createAllTables(mysql);
+		break;
+	case 'h':
+		usage();
+		break;
+	default:
+		break;
 
-	mysql_close(&mysql);	
+	}
+
+
+	mysql_close(mysql);
 
 	return 0;
+}
+
+
+static char parseOption(const char* option)
+{
+	/* make sure an option is given */
+	if (option == NULL)
+	{
+		return 'o';
+	}
+
+	if (strcmp_nocase(option, "-clear") == 0)
+	{
+		return 'c';
+	}
+
+	if (strcmp_nocase(option, "-reset") == 0)
+	{
+		return 'r';
+	}
+	if (strcmp_nocase(option, "-posts") == 0)
+	{
+		return 'p';
+	}
+	if (strcmp_nocase(option, "-users") == 0)
+	{
+		return 'u';
+	}
+	if (strcmp_nocase(option, "-streams") == 0)
+	{
+		return 's';
+	}
+	if (strcmp_nocase(option, "-help") == 0)
+	{
+		return 'h';
+	}
+	if (strcmp_nocase(option, "-init") == 0)
+	{
+		return 'i';
+	}
+
+	return 'o';
 }
 
 
@@ -47,7 +141,8 @@ int printUsers(MYSQL* mysql)
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL) {
+	if (mysql == NULL)
+	{
 		return -1;
 	}
 
@@ -87,7 +182,8 @@ int printStreams(MYSQL* mysql)
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL) {
+	if (mysql == NULL)
+	{
 		return -1;
 	}
 
@@ -127,7 +223,8 @@ int printposts(MYSQL* mysql)
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL) {
+	if (mysql == NULL)
+	{
 		return -1;
 	}
 
@@ -165,16 +262,92 @@ int printposts(MYSQL* mysql)
 }
 
 
-
-
-void usage()
+int clearAll(MYSQL* mysql)
 {
-	prinf("Usage: ./db\nuse to access the database\n");
+	/* make sure the parameters is valid */
+	if (mysql == NULL)
+	{
+		return -1;
+	}
+
+	clearTable(mysql, "users");
+	clearTable(mysql, "streams");
+	clearTable(mysql, "posts");
+	return 0;
+}
+
+
+int deleteAll(MYSQL* mysql)
+{
+	/* make sure the parameters is valid */
+	if (mysql == NULL)
+	{
+		return -1;
+	}
+
+	deleteTable(mysql, "users");
+	deleteTable(mysql, "streams");
+	deleteTable(mysql, "posts");
+	return 0;
+}
+
+
+int createAllTables(MYSQL* mysql)
+{
+	int status;
+	/* make sure the parameters is valid */
+	if (mysql == NULL)
+	{
+		return -1;
+	}
+
+	/* create the data lists */
+	char* namesUsers[] = {"ID", "user_id", "stream_name", "num_read"};
+	char* typesUsers[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "TEXT", "INT"};
+
+	char* namesStreams[] = {"ID", "stream_name", "num_posts"};
+	char* typesStreams[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "INT"};
+
+	char* namesPosts[] = {"ID", "stream_name", "user_id", "date", "text"};
+	char* typesPosts[] = {"INT NOT NULL AUTO_INCREMENT PRIMARY KEY", "TEXT", "TEXT", "DATETIME", "TEXT"};
+
+	/* try to create the users table */
+	status = createTable(mysql, "users", 4, namesUsers, typesUsers);
+	if (status != 0)
+	{
+		printf("Failed to create the users table.\n");
+		return -1;
+	}
+
+	/* try to create the posts table */
+	status = createTable(mysql, "posts", 5, namesPosts, typesPosts);
+	if (status != 0)
+	{
+		printf("Failed to create the posts table.\n");
+		return -1;
+	}
+
+	/* try to create the streams table */
+	status = createTable(mysql, "streams", 3, namesStreams, typesStreams);
+	if (status != 0)
+	{
+		printf("Failed to create the streams table.\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+
+static void usage()
+{
+	printf("Usage: ./db\nuse to access the database\n");
 	printf("  -clear : removes all of the posts, users, streams from the tables in the database\n");
 	printf("  -reset : deletes the tables from the database\n");
 	printf("  -posts : prints out all posts stored in the database\n");
 	printf("  -users : prints out all user names stored in the database\n");
 	printf("  -streams : prints out all stream names stored in the database\n");
+	printf("  -init : Creates the users, streams, and posts tables\n");
 	printf("  -help : displays this help message\n\n");
 }
 

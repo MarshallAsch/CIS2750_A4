@@ -26,7 +26,8 @@ typedef char* string;
  * A linked list structure for strings
  *
  */
-typedef struct StringList {
+typedef struct StringList
+{
 	char* str;
 	struct StringList * next;
 } StringList;
@@ -173,7 +174,7 @@ char* trim(char* input);
  * POST: none
  * ERROR: SEGFAULT on error
  */
-int strcmp_nocase(char* str1, char* str2);
+int strcmp_nocase(const char* str1, const char* str2);
 
 /**********************************
  *

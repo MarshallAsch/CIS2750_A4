@@ -31,7 +31,8 @@ int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** t
 	char* query;
 
 	/* make sure the parameters are valid */
-	if (mysql == NULL || tableName == NULL || name == NULL || type == NULL || numCol < 1) {
+	if (mysql == NULL || tableName == NULL || name == NULL || type == NULL || numCol < 1)
+	{
 		return -1;
 	}
 
@@ -41,7 +42,7 @@ int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** t
 	query = join(query, " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ");
 
 	/* create the columns of the table */
-	for (i = 0; i < numCol-1; i++)
+	for (i = 0; i < numCol - 1; i++)
 	{
 		query = join(query, name[i]);
 		query = joinC(query, ' ');
@@ -49,9 +50,9 @@ int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** t
 		query = join(query, ", ");
 	}
 
-	query = join(query, name[numCol-1]);
+	query = join(query, name[numCol - 1]);
 	query = joinC(query, ' ');
-	query = join(query, type[numCol-1]);
+	query = join(query, type[numCol - 1]);
 	query = joinC(query, ')');
 
 	/* mysql_query returns 0 on success */
@@ -72,33 +73,34 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	char* query;
 
 	/* make sure the parameters are valid */
-	if (mysql == NULL || tableName == NULL || field == NULL || value == NULL || numData < 1) {
+	if (mysql == NULL || tableName == NULL || field == NULL || value == NULL || numData < 1)
+	{
 		return -1;
 	}
 
 	/* create the query */
 	query = strduplicate("INSERT INTO ");
 	query = join(query, tableName);
-	
+
 
 	/* enter the column name */
-	for (i = 0; i < numCol-1; i++)
+	for (i = 0; i < numData - 1; i++)
 	{
 		query = join(query, field[i]);
 		query = join(query, ", ");
 	}
-	query = join(query, field[numCol-1]);
+	query = join(query, field[numData - 1]);
 	query = join(query, ") VALUES (");
 
 
 	/* enter the values */
-	for (i = 0; i < numCol-1; i++)
+	for (i = 0; i < numData - 1; i++)
 	{
 		query = join(query, value[i]);
 
 		query = join(query, ", ");
 	}
-	query = join(query, value[numCol-1]);
+	query = join(query, value[numData - 1]);
 	query = joinC(query, ')');
 
 
@@ -120,7 +122,8 @@ int update(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	char* query;
 
 	/* make sure the parameters are valid */
-	if (mysql == NULL || tableName == NULL || field == NULL || value == NULL || numData < 1) {
+	if (mysql == NULL || tableName == NULL || field == NULL || value == NULL || numData < 1)
+	{
 		return -1;
 	}
 
@@ -130,16 +133,16 @@ int update(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	query = join(query, " JOIN ");
 
 	/* enter the column name */
-	for (i = 0; i < numCol-1; i++)
+	for (i = 0; i < numData - 1; i++)
 	{
 		query = join(query, field[i]);
 		query = join(query, " = ");
 		query = join(query, value[i]);
 		query = join(query, ", ");
 	}
-	query = join(query, field[numCol-1]);
+	query = join(query, field[numData - 1]);
 	query = join(query, " = ");
-	query = join(query, value[numCol-1]);
+	query = join(query, value[numData - 1]);
 
 	/* mysql_query returns 0 on success */
 	if (mysql_query(mysql, query) != 0)
@@ -158,7 +161,8 @@ int clearTable(MYSQL* mysql, char* tableName)
 	char* query;
 
 	/* make sure that param are valid */
-	if (mysql == NULL || tableName == NULL) {
+	if (mysql == NULL || tableName == NULL)
+	{
 		return -1;
 	}
 
@@ -183,7 +187,8 @@ int deleteTable(MYSQL* mysql, char* tableName)
 	char* query;
 
 	/* make sure that param are valid */
-	if (mysql == NULL || tableName == NULL) {
+	if (mysql == NULL || tableName == NULL)
+	{
 		return -1;
 	}
 
@@ -221,18 +226,20 @@ void error(char* msg, MYSQL* mysql)
 ********************/
 
 
-SQL_users_result* new newUserResult(char* id, char* userID, char* stream, char* numRead)
+SQL_users_result* newUserResult(char* id, char* userID, char* stream, char* numRead)
 {
 	SQL_users_result* result;
 
 	/* make sure param are valid */
-	if (id == NULL || userID == NULL || stream == NULL || numRead == NULL) {
+	if (id == NULL || userID == NULL || stream == NULL || numRead == NULL)
+	{
 		return NULL;
 	}
 
 	/* allocate memory for the structure */
 	result = malloc(sizeof(SQL_users_result));
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return NULL;
 	}
 
@@ -240,23 +247,25 @@ SQL_users_result* new newUserResult(char* id, char* userID, char* stream, char* 
 	result->id = atoi(id);
 	result->user_id = strduplicate(userID);
 	result->stream_name = strduplicate(stream);
-	result->num_read = atoi(munRead);
+	result->num_read = atoi(numRead);
 
 	return result;
 }
 
-SQL_streams_result* new newStreamResult(char* id, char* stream, char* numPosts)
+SQL_streams_result* newStreamResult(char* id, char* stream, char* numPosts)
 {
 	SQL_streams_result* result;
 
 	/* make sure param are valid */
-	if (id == NULL || stream == NULL || numPosts == NULL) {
+	if (id == NULL || stream == NULL || numPosts == NULL)
+	{
 		return NULL;
 	}
 
 	/* allocate memory for the structure */
 	result = malloc(sizeof(SQL_streams_result));
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return NULL;
 	}
 
@@ -268,18 +277,20 @@ SQL_streams_result* new newStreamResult(char* id, char* stream, char* numPosts)
 	return result;
 }
 
-SQL_post_result* new newPostResult(char* id, char* userID, char* stream, char* date, char* text)
+SQL_post_result* newPostResult(char* id, char* userID, char* stream, char* date, char* text)
 {
 	SQL_post_result* result;
 
 	/* make sure param are valid */
-	if (id == NULL || userID == NULL || stream == NULL || date == NULL || text == NULL) {
+	if (id == NULL || userID == NULL || stream == NULL || date == NULL || text == NULL)
+	{
 		return NULL;
 	}
 
 	/* allocate memory for the structure */
 	result = malloc(sizeof(SQL_post_result));
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return NULL;
 	}
 
@@ -304,15 +315,17 @@ SQL_result* newResult(int numRows, int numFields)
 
 	/* allocate memory */
 	result = malloc(sizeof(SQL_result));
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return NULL;
 	}
 
 	/* allocate memory */
-	data = malloc(sizeof(void*)*(result->numRows + 1));
-	if (data == NULL) {
+	data = malloc(sizeof(void*) * (result->numRows + 1));
+	if (data == NULL)
+	{
 		free(result);
-		return;
+		return NULL;
 	}
 
 	/* fill with NULL's */
@@ -340,7 +353,8 @@ SQL_result* newResult(int numRows, int numFields)
 void freeUserResults(SQL_users_result* result)
 {
 	/* make sure the parameter is valid */
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return;
 	}
 
@@ -352,7 +366,8 @@ void freeUserResults(SQL_users_result* result)
 void freeStreamResults(SQL_streams_result* result)
 {
 	/* make sure the parameter is valid */
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return;
 	}
 
@@ -363,7 +378,8 @@ void freeStreamResults(SQL_streams_result* result)
 void freePostResults(SQL_post_result* result)
 {
 	/* make sure the parameter is valid */
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return;
 	}
 
@@ -378,7 +394,8 @@ void freePostResults(SQL_post_result* result)
 void addData(SQL_result* result, void* next)
 {
 	/* make sure the parameters are valid */
-	if (result == NULL || result->data == NULL || next == NULL) {
+	if (result == NULL || result->data == NULL || next == NULL)
+	{
 		return;
 	}
 
@@ -399,7 +416,8 @@ SQL_result* getUserStreams(MYSQL* mysql, char* userID)
 	MYSQL_ROW  row;
 
 	/* check the parameters */
-	if (mysql == NULL || userID == NULL) {
+	if (mysql == NULL || userID == NULL)
+	{
 		return NULL;
 	}
 
@@ -445,7 +463,8 @@ SQL_result* getStreamPosts(MYSQL* mysql, char* stream)
 	MYSQL_ROW  row;
 
 	/* check the parameters */
-	if (mysql == NULL || stream == NULL) {
+	if (mysql == NULL || stream == NULL)
+	{
 		return NULL;
 	}
 

@@ -28,18 +28,21 @@ then the values will be left blank.
 #include "fieldList.h"
 
 
-typedef enum Type {
+typedef enum Type
+{
 	key,
 	value
 } Type;
 
 
-typedef struct Param {
+typedef struct Param
+{
 	char* key;
 	char* value;
 } Param;
 
-typedef struct ParamList {
+typedef struct ParamList
+{
 	Param** list;
 	int length;
 } ParamList;
@@ -88,12 +91,6 @@ void parseFile(const char * fileName);
  * ERROR: ends on error
  */
 void parseTag(FILE* file, char type);
-
-/**********************
-
-	FIELDLIST OBJECT
-
-***********************/
 
 
 /**********************
