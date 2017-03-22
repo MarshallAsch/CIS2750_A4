@@ -1,0 +1,4 @@
+.h(size=1,text="Remove user")
+.n()
+.n()
+.i(action="removeuser.php", text="userID:", name="userID", value="userID", required=true, text="Comma seperated stream List:", name="streamList", value="streams", required=true)

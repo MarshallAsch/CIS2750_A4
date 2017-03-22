@@ -20,22 +20,24 @@ PyMODINIT_FUNC initdbWrapper();
 
 
 /* the list of the functions */
-static PyMethodDef module_method_getStreams[] = {
-   { "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
-   { NULL, NULL, 0, NULL }
+static PyMethodDef module_method_getStreams[] =
+{
+	{ "getUsersStreams", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
+	{ NULL, NULL, 0, NULL }
 };
 
-static PyMethodDef module_method_getPosts[] = {
-   { "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
-   { NULL, NULL, 0, NULL }
+static PyMethodDef module_method_getPosts[] =
+{
+	{ "getStreamPosts", (PyCFunction)db_getUserStreams, METH_VARARGS, NULL },
+	{ NULL, NULL, 0, NULL }
 };
 
 
 
 PyMODINIT_FUNC initdbWrapper()
 {
-   Py_InitModule3("getUsersStreams", module_method_getStreams, "");
-   Py_InitModule3("getStreamPosts", module_method_getPosts, "");
+	Py_InitModule3("getUsersStreams", module_method_getStreams, "");
+	Py_InitModule3("getStreamPosts", module_method_getPosts, "");
 }
 
 
@@ -49,7 +51,8 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	char* userID;
 
 
-	if (PyArg_ParseTuple(args, "s", userID) == 0) {
+	if (PyArg_ParseTuple(args, "s", userID) == 0)
+	{
 		return NULL;
 	}
 
@@ -58,7 +61,7 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	/* get the data */
 	result = getUserStreams(mysql, userID)
 
-	mysql_close(&mysql);
+	         mysql_close(&mysql);
 
 
 	return genResult_streams(result);
@@ -71,7 +74,8 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	char* stream;
 
 
-	if (PyArg_ParseTuple(args, "s", stream) == 0) {
+	if (PyArg_ParseTuple(args, "s", stream) == 0)
+	{
 		return NULL;
 	}
 
@@ -80,7 +84,7 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	/* get the data */
 	result = getStreamPosts(mysql, stream)
 
-	mysql_close(&mysql);
+	         mysql_close(&mysql);
 
 
 	return genResult_posts(result);
@@ -100,7 +104,8 @@ static PyObject* genResult_streams(SQL_result* result)
 
 	PyObject* list;
 
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return Py_RETURN_NONE;
 	}
 
@@ -133,7 +138,8 @@ static PyObject* genResult_posts(SQL_result* result)
 
 	PyObject* list;
 
-	if (result == NULL) {
+	if (result == NULL)
+	{
 		return Py_RETURN_NONE;
 	}
 
@@ -144,7 +150,7 @@ static PyObject* genResult_posts(SQL_result* result)
 	{
 		post = result->data[i];
 		obj = Py_BuildValue("issss", post->id, post->stream_name, post->user_id, post->date, post->text);
-		
+
 		freePostResults(post);
 		PyList_SetItem(list, obj);
 	}

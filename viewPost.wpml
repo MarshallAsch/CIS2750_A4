@@ -1,0 +1,13 @@
+.h(size=1,text="Select a Stream", style="text-align: center")
+.d()
+
+.h(size=4,text="Welcome <?php echo $userID; ?>", style="text-align: right; padding-right: 40px")
+.n()
+.n()
+.b(onclick = "previous()", name="<i class='fa fa-angle-left'></i> previous", id="prev_btn")
+.b(onclick = "refresh()", name="<i class='fa fa-refresh'></i> refresh")
+.b(onclick = "sort()", name="sort", id="srt_btn")
+.b(onclick = "markAll()", name="Mark all")
+.b(onclick = "next()", name="next <i class='fa fa-angle-right'></i>", id="next_btn")
+.n()
+.n()

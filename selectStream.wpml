@@ -1,0 +1,7 @@
+.h(size=1,text="Select a Stream", style="text-align: center")
+.d()
+
+.h(size=4,text="Welcome <?php echo $userID; ?>", style="text-align: right; padding-right: 40px")
+.n()
+.n()
+.s()
