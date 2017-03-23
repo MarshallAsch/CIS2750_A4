@@ -80,6 +80,11 @@ int newStream(MYSQL* mysql, char* streamName);
 int addUser(MYSQL* mysql, char* streamName, char* userID);
 int removeUser(MYSQL* mysql, char* streamName, char* userID);
 
+int getNumPosts(MYSQL * mysql, char* streamName);
+int markAllRead(MYSQL * mysql, char* streamName, char* userID);
+int markOneRead(MYSQL * mysql, char* streamName, char* userID);
+
+
 
 
 

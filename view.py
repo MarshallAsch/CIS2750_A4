@@ -7,7 +7,7 @@
 # Date: March 14, 2017                  	   Course Name: CIS*2750
 # Assignment: A3
 #
-# Loads all of the posts in the given streams and prints a JSON 
+# Loads all of the posts in the given streams and prints a JSON
 # package with that info on success
 #
 # {data: [{stream: "..", author: "..", date: "..", viewed: "..", text: ".."}, ... ]}
@@ -24,8 +24,9 @@ import os
 import sys
 import time
 import textwrap
+import dbwrapper
 
-# class that holds all the data for each post 
+# class that holds all the data for each post
 #
 class Post:
 	"""Object used to hold all of the info assosiated with a
@@ -98,7 +99,7 @@ def getStreams():
 
 # get the list of streams that the user
 # has permission to read
-# 
+#
 def getUserStreams(userID):
 
 	#all the streams
@@ -208,12 +209,12 @@ def loadPosts(streams, userID):
 			# split it into 3 tokens
 			data = line.split("\n", 2)
 
-			# create the post 
+			# create the post
 			if (i < numRead):
 				post = Post(data[0], data[1], stream, data[2], startBytes[i], True)
 			else:
 				post = Post(data[0], data[1], stream, data[2], startBytes[i], False)
-			
+
 			# add the post to the end of the list
 			posts.append(post)
 
@@ -276,7 +277,7 @@ def getStreamsToShow(streams, allStreams):
 #    or by stream name if option == 2
 def sort(posts, option = 0):
 
-	# sort baised on the option given 
+	# sort baised on the option given
 	if (option == 0):
 		return sorted(posts, key=lambda post: post.sortDate)
 	elif (option == 1):
@@ -289,7 +290,7 @@ def sort(posts, option = 0):
 #
 def main():
 
-	# get the command line arguments 
+	# get the command line arguments
 	argc = len(sys.argv)
 	argv = sys.argv
 
@@ -326,7 +327,7 @@ def main():
 #
 main()
 
-		
+
 
 
 

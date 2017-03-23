@@ -14,6 +14,13 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args);
 
 static PyObject* db_newStream(PyObject *self, PyObject *args);
 
+static PyObject* db_markAll(PyObject *self, PyObject *args);
+
+static PyObject* db_markOne(PyObject *self, PyObject *args);
+
+
+
+
 
 /* internal */
 static PyObject* genResult_streams(SQL_result* result);
@@ -32,6 +39,8 @@ static PyMethodDef dbwrapper_funcs[] =
 	{ "addAuthor", (PyCFunction)db_addAuthor, METH_VARARGS, NULL },
 	{ "removeAuthor", (PyCFunction)db_removeAuthor, METH_VARARGS, NULL },
 	{ "addStream", (PyCFunction)db_newStream, METH_VARARGS, NULL },
+	{ "markAll", (PyCFunction)db_markAll, METH_VARARGS, NULL },
+	{ "markOne", (PyCFunction)db_markOne, METH_VARARGS, NULL },
 	{ NULL, NULL, 0, NULL }
 };
 
@@ -118,7 +127,7 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	stream = NULL;
 	userID = NULL;
 
-	if (PyArg_ParseTuple(args, "ss", &stream, &userID) == 0)
+	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
 	}
@@ -152,7 +161,7 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 	stream = NULL;
 	userID = NULL;
 
-	if (PyArg_ParseTuple(args, "ss", &stream, &userID) == 0)
+	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
 	}
@@ -167,6 +176,57 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
+static PyObject* db_markAll(PyObject *self, PyObject *args)
+{
+	MYSQL* mysql;
+	char* stream;
+	char* userID;
+	int status;
+
+
+	stream = NULL;
+	userID = NULL;
+
+	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
+	{
+		return NULL;
+	}
+
+	mysql = initSQL();
+
+	/* add the user to the if they were not already there */
+	status = markAllRead(mysql, stream, userID);
+
+	mysql_close(mysql);
+
+	return Py_BuildValue("i", status);
+}
+
+static PyObject* db_markOne(PyObject *self, PyObject *args)
+{
+	MYSQL* mysql;
+	char* stream;
+	char* userID;
+	int status;
+
+
+	stream = NULL;
+	userID = NULL;
+
+	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
+	{
+		return NULL;
+	}
+
+	mysql = initSQL();
+
+	/* add the user to the if they were not already there */
+	status = markOneRead(mysql, stream, userID);
+
+	mysql_close(mysql);
+
+	return Py_BuildValue("i", status);
+}
 
 static PyObject* db_newStream(PyObject *self, PyObject *args)
 {

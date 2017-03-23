@@ -44,7 +44,7 @@ def getStreams():
 
 # get the list of streams that the user
 # has permission to read
-# 
+#
 def getUserStreams(userID):
 
 	#all the streams
@@ -154,12 +154,12 @@ def loadPosts(streams, userID):
 			# split it into 3 tokens
 			data = line.split("\n", 2)
 
-			# create the post 
+			# create the post
 			if (i < numRead):
 				post = Post(data[0], data[1], stream, data[2], startBytes[i], True)
 			else:
 				post = Post(data[0], data[1], stream, data[2], startBytes[i], False)
-			
+
 			# add the post to the end of the list
 			posts.append(post)
 
@@ -245,7 +245,7 @@ def markAll(stream, userID):
 #
 def main():
 
-	# get the command line arguments 
+	# get the command line arguments
 	argc = len(sys.argv)
 	argv = sys.argv
 
@@ -285,7 +285,7 @@ def main():
 #
 main()
 
-		
+
 
 
 

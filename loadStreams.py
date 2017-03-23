@@ -14,74 +14,13 @@
 
 
 # neccisary includes
-import os
-import sys
-
-# get the name of all the streams in the messages dirrectory
-# if there are no streams returns an empty list
-def getStreams():
-	fileList = os.listdir("messages")
-	streamList = []
-
-	#go through all the files and get just the streamNames
-	for file in fileList:
-
-		#ignore the users and data files
-		if (file.endswith("Stream")):
-
-			#cut of the Stream part of the name
-			endPos = file.find("Stream", 0)
-			if (endPos != -1):
-				file = file[0:endPos]
-			#add to new list
-			streamList.append(file)
-	return streamList
-
-# get the list of streams that the user
-# has permission to read
-# 
-def getUserStreams(userID):
-
-	#all the streams
-	streams = getStreams()
-
-	#the list of streams the user is in
-	streamsUsersIn = []
-
-	#check every stream user file for the userName
-	for stream in streams:
-		streamUser = "messages/" + stream + "StreamUsers"
-		file = open(streamUser, "r", 1)
-
-		#search the entire file
-		while True:
-			line = file.readline()
-
-			#reached the end of the file
-			if line == "":
-				break
-
-			# find the seperater bwtween the userID and the number
-			splitInd = line.rfind(" ")
-			if(splitInd == -1):
-				streamsUsersIn = []
-				break
-
-			#make sure the user has permission
-			if (userID == line[0:splitInd].strip()):
-				streamsUsersIn.append(stream)
-				break
-
-		file.close()
-
-	return streamsUsersIn
-
+import dbwrapper
 
 # main entry point for the program
 #
 def main():
 
-	# get the command line arguments 
+	# get the command line arguments
 	argc = len(sys.argv)
 	argv = sys.argv
 
@@ -96,20 +35,20 @@ def main():
 	userID = ' '.join(argv)
 
 	# get all the streams the user has permission in
-	streams = getUserStreams(userID)
+	streams = dbwrapper.getUsersStreams(userID)[2]
 
 	# if they dont have permission end
 	if (streams == []):
 		exit(1)
 
 	for stream in streams:
-		print(stream)
+		print(stream[2])
 
 # run main
 #
 main()
 
-		
+
 
 
 
