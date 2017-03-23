@@ -25,7 +25,8 @@ Contains all the functions for writing to creating and modifying the streams
 
 
 
-struct userPost {
+struct userPost
+{
 	char *username;
 	char *streamname;
 	char *date;
@@ -42,32 +43,7 @@ struct userPost {
  */
 void destroyPost(struct userPost * post);
 
-/**
- * checkStream
- * Checks if a file that belongs to the stream exist.
- *
- * IN:	streamName, the name of the stream that is being checked
- * OUT: TRUE, if the file for the stream exists
- *		FALSE, if the file for the stream does not exist or if there is an error
- * POST: The file is opened and closed if it exists
- * ERROR: FALSE is returned if the streamName is NULL
- */
-bool checkStream(char* streamName);
 
-/**
- * checkPermissions
- * Checks if a given userID has permisions to view/ post to a given stream.
- * If they have access then it will return the number of posts that the user
- * has read in the stream, otherwise -1 is returned.
- *
- * IN:	streamName, the name of the stream that is being checked
- *		userID, the user whos permissions is being checked.
- * OUT:  the number of posts the user has read if they have permission.
- *		-1 if the user does not have permsiion, the stream does not exist or error
- * POST: The file is opened and closed if it exists
- * ERROR: -1 is returned if there is an error.
- */
-int checkPermissions(char* streamName, char* userID);
 
 /**
  * updateStream
@@ -111,17 +87,6 @@ void addUser(char *username, char *list);
  * ERROR: returns if the parameters are invalid
  */
 void removeUser(char *username, char *list);
-
-/**
- * createFiles
- * Creates all 3 files that are required for the stream.
- *
- * IN:	streamName, the name of the stream that is being created
- * OUT:	none
- * POST: 3 files are created if they do not exist
- * ERROR: nothing happens if the filename is invalid.
- */
-void createFiles(char* streamName);
 
 /**
  * parseList

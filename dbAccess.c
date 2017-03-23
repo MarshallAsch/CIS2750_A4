@@ -577,6 +577,50 @@ int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 }
 
 
+
+int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char* date)
+{
+	char* condition;
+	int num;
+	/* make sure that param are valid */
+	if (mysql == NULL || streamName == NULL || userID == NULL || text == NULL || date == NULL)
+	{
+		return -1;
+	}
+
+	/* check to see if the user is already in the stream */
+	condition = strduplicate("stream_name = \"");
+	condition = join(condition, streamName);
+	condition = join(condition, "\" AND user_id = \"");
+	condition = join(condition, userID);
+	condition = join(condition, "\"");
+
+	num = count_DB(mysql, "users", condition);
+	free(condition);
+
+	char* fieldName[] = {"user_id", "stream_name", "date", "text"};
+	char* data[] = {userID, streamName, date, text};
+
+
+	if (num == 1)
+	{
+		/* if the user is alreay in the stream */
+		return insert_DB(mysql, "posts", 4, fieldName, data);
+	}
+	else if (num == 0)
+	{
+		/* status of insert*/
+		return -2;
+	}
+	else
+	{
+		/* error code */
+		return num;
+	}
+}
+
+
+
 /**
  * Prints the error message
  *

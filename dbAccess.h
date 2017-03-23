@@ -85,6 +85,7 @@ int markAllRead_DB(MYSQL * mysql, char* streamName, char* userID);
 int markOneRead_DB(MYSQL * mysql, char* streamName, char* userID);
 
 int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID);
+int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char* date);
 
 
 

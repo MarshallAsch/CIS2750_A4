@@ -51,45 +51,25 @@ void destroyPost(struct userPost * post)
  */
 void updateStream(struct userPost *st)
 {
-	FILE* stream;			/* file that contains the posts*/
-	FILE* streamData;		/* file that contains the start byte of each post*/
+	MYSQL* mysql;
 
-	char* fileName;
-	char* baseName;
-	int filePos;
-
-	/* create the files if they dont exist */
-	createFiles(st->streamname);
-
-	baseName = strduplicate("messages/");
-	baseName = join(baseName, st->streamname);
-	baseName = join(baseName, "Stream");
-
-	fileName = strduplicate(baseName);
-	fileName = join(fileName, "Data");
-
-	/* open the file for apending only */
-	stream = fopen(baseName, "a");
-	streamData = fopen(fileName, "a");
-
-	free(fileName);
-	free(baseName);
-
-	/* if the files exist then write the post to the file*/
-	if (stream != NULL && streamData != NULL)
+	if (st == NULL)
 	{
-		/* get the position and write it to the data file */
-		filePos = ftell(stream);
-		fprintf(streamData, "%d\n", filePos);
-
-		/* write post to the file */
-		fprintf(stream, "%s\n%s\n%s\n", st->username, st->date, st->text);
-
+		return;
 	}
 
-	/* close the files*/
-	fclose(stream);
-	fclose(streamData);
+	/* connect to datase */
+	mysql = initSQL();
+	if (mysql == NULL)
+	{
+		return;
+	}
+
+	/* write post to the DB */
+	submitPost_DB(mysql, st->streamname, st->username, st->text, st->date);
+
+
+	mysql_close(mysql);
 }
 
 /**
@@ -141,7 +121,6 @@ void addUser(char *username, char *list)
 	/* loop through every name in the list */
 	while (temp != NULL)
 	{
-		createFiles(temp->str);
 		status = addUser_DB(mysql, temp->str, username);
 
 		/* check if the user already has permission to veiew a stream */
@@ -180,16 +159,9 @@ void removeUser(char *username, char *list)
 {
 	/* adds a user with the given user name to all of the sreams in the list*/
 	StringList * streamList;
-	StringList * fileData;
-	StringList * tempFile;
-
-	int pos;
 	StringList * temp;
-	char * fileName;
-	char* lineBuff;
-	char * name;
-	FILE* streamUsers;
 
+	MYSQL* mysql;
 	int status;
 
 	/* make sure the parameters are valid */
@@ -198,273 +170,44 @@ void removeUser(char *username, char *list)
 		return;
 	}
 
-	streamList = parseList(list);
-
-	/* something went wrong or none were given */
-	if (streamList == NULL)
+	/* connect to the mysql database */
+	mysql = initSQL();
+	if (mysql == NULL)
 	{
 		return;
 	}
 
-	temp = streamList;
+	/* something went wrong or none were given */
+	streamList = parseList(list);
+	if (streamList == NULL)
+	{
+		mysql_close(mysql);
+		return;
+	}
 
 	/* loop through every name in the list */
+	temp = streamList;
 	while (temp != NULL)
 	{
-		status = checkPermissions(temp->str, username);
+		status = removeUser_DB(mysql, temp->str, username);
 
 		/* check if the user already has permission to veiew a stream */
-		if (status == -2)
+		if (status < 0)
 		{
-			fprintf(stderr, "The stream [%s] does not exist.\n", temp->str);
-		}
-		else if (status == -3)
-		{
-			fprintf(stderr, "The user [%s] does not have permission in stream [%s].\n", username, temp->str);
-		}
-		else if (status == -1)
-		{
-			fprintf(stderr, "Error something went wrong checking permission for the stream [%s]\n", temp->str);
+			fprintf(stderr, "Error removing user [%s] from [%s].\n", username, temp->str);
 		}
 		else
 		{
-			/* generate the file name */
-			fileName = strduplicate("messages/");
-			fileName = join(fileName, temp->str);
-			fileName = join(fileName, "StreamUsers");
-			streamUsers = fopen(fileName, "r");
+			fprintf(stderr, "The user [%s] removed from stream [%s].\n", username, temp->str);
 
-			fileData = NULL;
-
-			/* does not do any input buffering/ checking*/
-			while ((lineBuff = trim(fgetstr(streamUsers))))
-			{
-				/* make sure it was successful reading the line */
-				if (lineBuff == NULL)
-				{
-					break;
-				}
-
-				/* get the position of the devider between the name and the count */
-				pos = lastIndex(lineBuff, ' ');
-
-				/* make sure that the line has valid data */
-				if (pos == -1)
-				{
-					break;
-				}
-
-				/* get the name part of the string*/
-				name = trim(substring(lineBuff, 0, pos));
-
-				/* check to see if the the row does not match username */
-				if (strcmp(name, username) != 0)
-				{
-					fileData = addToStringList(fileData, newStringList(lineBuff));
-				}
-
-				free(name);
-				free(lineBuff);
-			}
-
-			/* close the file so it can be reopended */
-			fclose(streamUsers);
-			streamUsers = fopen(fileName, "w");
-
-			if (streamUsers != NULL)
-			{
-				/* print the data to the file */
-				tempFile = fileData;
-				while (tempFile != NULL)
-				{
-					fprintf(streamUsers, "%s\n", tempFile->str);
-					tempFile = tempFile->next;
-				}
-			}
-
-			free(fileName);
-			fclose(streamUsers);
-			destroyStringList(fileData);
 		}
 		temp = temp->next;
 	}
 
+	mysql_close(mysql);
 	destroyStringList(streamList);
 }
 
-/**
- * checkStream
- * Checks if a file that belongs to the stream exist.
- *
- * IN:	streamName, the name of the stream that is being checked
- * OUT: TRUE, if the file for the stream exists
- *		FALSE, if the file for the stream does not exist or if there is an error
- * POST: The file is opened and closed if it exists
- * ERROR: FALSE is returned if the streamName is NULL
- */
-bool checkStream(char* streamName)
-{
-	FILE* stream;
-	char* fileName;
-
-	/* check parameters */
-	if (streamName == NULL)
-	{
-		return FALSE;
-	}
-
-	/* generate the file name to check for */
-	fileName = strduplicate("messages/");
-	fileName = join(fileName, streamName);
-	fileName = join(fileName, "Stream");
-
-	/* open the file */
-	stream = fopen(fileName, "r");
-	free(fileName);
-
-	/* then the file does not exist and create a new stream */
-	if (stream == NULL)
-	{
-		return FALSE;
-	}
-
-	/* the stream does exist */
-	fclose(stream);
-	return TRUE;
-}
-
-/**
- * checkPermissions
- * Checks if a given userID has permisions to view/ post to a given stream.
- * If they have access then it will return the number of posts that the user
- * has read in the stream, otherwise -1 is returned.
- *
- * IN:	streamName, the name of the stream that is being checked
- *		userID, the user whos permissions is being checked.
- * OUT:  the number of posts the user has read if they have permission.
- *		-1 on error
- *		-2 if the file does not exist
- *		-3 if the user does not have permissions
- * POST: The file is opened and closed if it exists
- * ERROR: -1 is returned if there is an error.
- */
-int checkPermissions(char* streamName, char* userID)
-{
-	FILE* streamUsers;
-	char* fileName;
-	char* lineBuff;
-	char* numBuff;
-	char* name;
-	int numRead;
-	int pos;
-
-	/* check the parameter list */
-	if (streamName == NULL || userID == NULL)
-	{
-		return -1;
-	}
-
-	fileName = strduplicate("messages/");
-	fileName = join(fileName, streamName);
-	fileName = join(fileName, "StreamUsers");
-
-	streamUsers = fopen(fileName, "r");
-
-	free(fileName);
-
-	/* if the stream does not exist */
-	if (streamUsers == NULL)
-	{
-		return -2;
-	}
-
-	/* does not do any input buffering/ checking*/
-	while ((lineBuff = trim(fgetstr(streamUsers))))
-	{
-		/* make sure it was successful reading the line */
-		if (lineBuff == NULL)
-		{
-			break;
-		}
-
-		/* get the position of the devider between the name and the count */
-		pos = lastIndex(lineBuff, ' ');
-
-		/* make sure that the line has valid data */
-		if (pos == -1)
-		{
-			break;
-		}
-		/* seperate the strings into name and value */
-		numBuff = trim(substring(lineBuff, pos, strlen(lineBuff) - 1));
-		name = trim(substring(lineBuff, 0, pos));
-		numRead = atoi(numBuff);
-
-		free(lineBuff);
-		free(numBuff);
-
-		/* check to see if the user ID matches*/
-		if (strcmp(name, userID) == 0)
-		{
-			free(name);
-			fclose(streamUsers);
-			return numRead;
-		}
-
-		free(name);
-	}
-
-	fclose(streamUsers);
-	return -3;
-}
-
-/**
- * createFiles
- * Creates all 3 files that are required for the stream.
- *
- * IN:	streamName, the name of the stream that is being created
- * OUT:	none
- * POST: 3 files are created if they do not exist
- * ERROR: nothing happens if the filename is invalid.
- */
-void createFiles(char* streamName)
-{
-	char* fileName;
-	char* baseName;
-	FILE* file;
-
-	/* make sure the parameters are given */
-	if (streamName == NULL)
-	{
-		return;
-	}
-
-	/* generate the base file name for the stream */
-	baseName = strduplicate("messages/");
-	baseName = join(baseName, streamName);
-	baseName = join(baseName, "Stream");
-
-	/* <stream>Stream */
-	file = fopen(baseName, "a");
-	fclose(file);
-
-	/* <stream>StreamData */
-	fileName = strduplicate(baseName);
-	fileName = join(fileName, "Data");
-	file = fopen(fileName, "a");
-	fclose(file);
-
-	/* <stream>StreamUsers */
-	free(fileName);
-	fileName = strduplicate(baseName);
-	fileName = join(fileName, "Users");
-	file = fopen(fileName, "a");
-
-	/* close the file and free the strings */
-	fclose(file);
-	free(fileName);
-	free(baseName);
-}
 
 /**
  * parseList

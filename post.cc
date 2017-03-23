@@ -17,12 +17,13 @@ To build this must be converted to to a .c using A1
 
 
 /**
- * PostEntry thte class that holds the the 
- * functions for loading the users input to 
+ * PostEntry thte class that holds the the
+ * functions for loading the users input to
  * create a post
  *
  */
-class PostEntry {
+class PostEntry
+{
 
 	char * streamName;
 	char * text;
@@ -33,13 +34,13 @@ class PostEntry {
 	/**
 	 * readInput
 	 * Prompts user to enter the name of the stream to post to and the text
-	 * for the post. Saves the data to class variables. 
+	 * for the post. Saves the data to class variables.
 	 *
 	 * IN:	none
 	 * OUT:  0, if the input is aquired successflly
 	 *		-1, if something goes wrong
 	 * POST: The input is saved into the class
-	 * ERROR: -1 if something goes wrong 
+	 * ERROR: -1 if something goes wrong
 	 */
 	int readInput(char* fileName)
 	{
@@ -48,13 +49,15 @@ class PostEntry {
 
 
 		/* make sure that the file name exists */
-		if (fileName == NULL) {
+		if (fileName == NULL)
+		{
 			return -1;
 		}
 
 		/* try opening the file */
 		file = fopen(fileName, "r");
-		if (file == NULL) {
+		if (file == NULL)
+		{
 			return -2;
 		}
 
@@ -64,14 +67,15 @@ class PostEntry {
 		fseek(file, 0L, SEEK_SET);
 
 		/* allocate mem for the buffer*/
-		text = malloc(size + sizeof(char)*4);
-		if (text == NULL) {
+		text = malloc(size + sizeof(char) * 4);
+		if (text == NULL)
+		{
 			fclose(file);
 			return -3;
 		}
 
 		/* read the file */
-		memset(text, '\0', size+2);
+		memset(text, '\0', size + 2);
 		fread(text, size, 1, file);
 
 
@@ -98,7 +102,8 @@ class PostEntry {
 		post = malloc(sizeof(struct userPost));
 
 		/* make sure that malloc worked */
-		if (post == NULL) {
+		if (post == NULL)
+		{
 			return NULL;
 		}
 
@@ -113,16 +118,16 @@ class PostEntry {
 
 	/**
 	 * getTimeDate
-	 * Creates a time string in the format of 
+	 * Creates a time string in the format of
 	 *
-	 * YYYY-MM-DD:HH:mm:ss
+	 * YYYY-MM-DD HH:mm:ss
 	 * MM  range, 01 to 12
 	 * DD  range, 01 to 31
 	 * HH  range, 00 to 23
 	 * mm  range, 00 to 59
 	 * ss  range, 00 to 59
 	 *
-	 * adds the string to the class varaible date 
+	 * adds the string to the class varaible date
 	 *
 	 * IN:	none
 	 * OUT: the date string on success
@@ -135,25 +140,26 @@ class PostEntry {
 		/* gets date time formats and returns it as a string*/
 		time_t rawtime;
 		struct tm * currentTime;
-		
+
 		time( &rawtime );
 
 		currentTime = localtime( &rawtime );
 
-		date = malloc(sizeof(char)*(21));
+		date = malloc(sizeof(char) * (21));
 
 		/* make sure amlloc worked */
-		if (date == NULL) {
+		if (date == NULL)
+		{
 			return NULL;
 		}
 
 		/* create the date string*/
-		sprintf(date, "%04d-%02d-%02d:%02d:%02d:%02d", currentTime->tm_year + 1900, 
-			currentTime->tm_mon + 1, 
-			currentTime->tm_mday, 
-			currentTime->tm_hour, 
-			currentTime->tm_min, 
-			currentTime->tm_sec);
+		sprintf(date, "%04d-%02d-%02d %02d:%02d:%02d", currentTime->tm_year + 1900,
+		        currentTime->tm_mon + 1,
+		        currentTime->tm_mday,
+		        currentTime->tm_hour,
+		        currentTime->tm_min,
+		        currentTime->tm_sec);
 
 
 		return date;
@@ -173,29 +179,6 @@ class PostEntry {
 	 */
 	void submitPost()
 	{
-		int status;
-
-		status = checkPermissions(streamName, userID);
-
-		/* check the result if the permission check */
-		if (status == -1) 
-		{
-			fprintf(stderr, "Error\n");
-			return;
-		}
-		else if (status == -2)
-		{
-			createFiles(streamName);
-			fprintf(stderr, "Permission denied new empty stream [%s] created.\n", streamName);
-			return;
-		}
-		else if (status == -3)
-		{
-			createFiles(streamName);
-			fprintf(stderr, "Permission denied [%s] in [%s].\n", userID, streamName);
-			return;
-		}
-
 		/* submit the post */
 		updateStream(post);
 
@@ -240,7 +223,7 @@ class PostEntry {
 
 /**
  * main
- * The main entry point to the program. Creates a 
+ * The main entry point to the program. Creates a
  * PostEntry object, initilizes it then creates a post
  * to submit.
  * Defauts to accepting multi work userID's
@@ -260,7 +243,8 @@ int main(int argc, char const *argv[])
 	char * postFile;
 
 	/* check that the correct parameters were given*/
-	if (argc != 4) {
+	if (argc != 4)
+	{
 		printf("usage ./post \"userID\" \"stream name\" \"postfile\"\n");
 		return 1;
 	}
