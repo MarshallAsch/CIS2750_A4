@@ -84,6 +84,8 @@ int getNumPosts(MYSQL * mysql, char* streamName);
 int markAllRead(MYSQL * mysql, char* streamName, char* userID);
 int markOneRead(MYSQL * mysql, char* streamName, char* userID);
 
+int getNumRead(MYSQL * mysql, char* streamName, char* userID);
+
 
 
 

@@ -146,6 +146,9 @@ Future improvements
 
 changes the forms to accept multiple input types.
 
+keep track of the stream name using JSON packets
+
+
 *****************
 References
 *****************

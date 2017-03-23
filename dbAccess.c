@@ -506,6 +506,61 @@ int getNumPosts(MYSQL * mysql, char* streamName)
 	return num;
 }
 
+
+int getNumRead(MYSQL * mysql, char* streamName, char* userID)
+{
+	char* query;
+	MYSQL_RES* results;
+	MYSQL_ROW  row;
+	int num;
+
+	/* make sure that param are valid */
+	if (mysql == NULL || streamName == NULL || userID == NULL)
+	{
+		return -1;
+	}
+
+	/* get the total number of posts */
+	query = strduplicate("SELECT num_read FROM users WHERE stream_name = \"");
+	query = join(query, streamName);
+	query = join(query, "\" AND user_id = \"");
+	query = join(query, userID);
+	query = join(query, "\"");
+
+	if (mysql_query(mysql, query) != 0)
+	{
+		error("failed to perform the query", mysql);
+		free(query);
+		return -2;
+	}
+	free(query);
+
+
+	/* store the results of the query */
+	if (!(results = mysql_store_result(mysql)))
+	{
+		error("failed to load the data.", mysql);
+		return -3;
+	}
+
+	/* make sure there is only 1 result row */
+	if (mysql_num_rows(results) != 1)
+	{
+		mysql_free_result(results);
+		return -4;
+	}
+
+	/* get the number from the results */
+	row = mysql_fetch_row(results);
+	num = atoi(row[0]);
+
+	mysql_free_result(results);
+
+
+	return num;
+}
+
+
 /**
  * Prints the error message
  *

@@ -25,7 +25,7 @@ static PyObject* db_markOne(PyObject *self, PyObject *args);
 /* internal */
 static PyObject* genResult_streams(SQL_result* result);
 
-static PyObject* genResult_posts(SQL_result* result);
+static PyObject* genResult_posts(SQL_result* result, int numRead);
 
 
 
@@ -95,15 +95,20 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	MYSQL* mysql;
 	SQL_result* result;
 	char* stream;
+	char* userID;
+	int numRead;
 
+	userID = NULL;
 	stream = NULL;
 
-	if (PyArg_ParseTuple(args, "s", &stream) == 0)
+	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
 	}
 
 	mysql = initSQL();
+
+	numRead = getNumRead(mysql, stream, userID);
 
 	/* get the data */
 	result = getStreamPosts(mysql, stream);
@@ -111,7 +116,7 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	mysql_close(mysql);
 
 
-	return genResult_posts(result);
+	return genResult_posts(result, numRead);
 }
 
 
@@ -291,7 +296,7 @@ static PyObject* genResult_streams(SQL_result* result)
 }
 
 /* destroys the result struct */
-static PyObject* genResult_posts(SQL_result* result)
+static PyObject* genResult_posts(SQL_result* result, int numRead)
 {
 	int i;
 	SQL_post_result* post;
@@ -310,7 +315,14 @@ static PyObject* genResult_posts(SQL_result* result)
 	for (i = 0; i < result->numRows; i++)
 	{
 		post = result->data[i];
-		obj = Py_BuildValue("issss", post->id, post->stream_name, post->user_id, post->date, post->text);
+		if ( i <= numRead)
+		{
+			obj = Py_BuildValue("issssi", post->id, post->stream_name, post->user_id, post->date, post->text, 1);
+		}
+		else
+		{
+			obj = Py_BuildValue("issssi", post->id, post->stream_name, post->user_id, post->date, post->text, 0);
+		}
 
 		freePostResults(post);
 		PyList_SetItem(list, i, obj);

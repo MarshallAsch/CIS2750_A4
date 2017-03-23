@@ -14,6 +14,7 @@
 
 
 # neccisary includes
+import sys
 import dbwrapper
 
 # main entry point for the program
