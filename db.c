@@ -170,6 +170,7 @@ int printUsers(MYSQL* mysql)
 		printf("%s\n", row[0]);
 	}
 
+	mysql_free_result(results);
 
 	return 0;
 }
@@ -210,6 +211,7 @@ int printStreams(MYSQL* mysql)
 	{
 		printf("%s\n", row[0]);
 	}
+	mysql_free_result(results);
 
 
 	return 0;
@@ -256,6 +258,7 @@ int printposts(MYSQL* mysql)
 		printf("text: %s\n", row[3]);
 		printf("----------------------------------------\n\n");
 	}
+	mysql_free_result(results);
 
 
 	return 0;
@@ -270,9 +273,9 @@ int clearAll(MYSQL* mysql)
 		return -1;
 	}
 
-	clearTable(mysql, "users");
-	clearTable(mysql, "streams");
-	clearTable(mysql, "posts");
+	deleteFromTable(mysql, "users", NULL);
+	deleteFromTable(mysql, "streams", NULL);
+	deleteFromTable(mysql, "posts", NULL);
 	return 0;
 }
 
@@ -285,9 +288,9 @@ int deleteAll(MYSQL* mysql)
 		return -1;
 	}
 
-	deleteTable(mysql, "users");
-	deleteTable(mysql, "streams");
-	deleteTable(mysql, "posts");
+	dropTable(mysql, "users");
+	dropTable(mysql, "streams");
+	dropTable(mysql, "posts");
 	return 0;
 }
 
@@ -303,10 +306,10 @@ int createAllTables(MYSQL* mysql)
 
 	/* create the data lists */
 	char* namesUsers[] = {"user_id", "stream_name", "num_read"};
-	char* typesUsers[] = {"TEXT", "TEXT", "INT"};
+	char* typesUsers[] = {"TEXT", "TEXT", "INT DEFAULT 0"};
 
 	char* namesStreams[] = {"stream_name", "num_posts"};
-	char* typesStreams[] = {"TEXT", "INT"};
+	char* typesStreams[] = {"TEXT", "INT DEFAULT 0"};
 
 	char* namesPosts[] = {"stream_name", "user_id", "date", "text"};
 	char* typesPosts[] = {"TEXT", "TEXT", "DATETIME", "TEXT"};

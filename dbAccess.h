@@ -68,11 +68,19 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 
 int update(MYSQL* mysql, char* tableName, int numData, char** field, char** value);
 
-int clearTable(MYSQL* mysql, char* tableName);
+int deleteFromTable(MYSQL* mysql, char* tableName, char* condition);
 
-int deleteTable(MYSQL* mysql, char* tableName);
+int dropTable(MYSQL* mysql, char* tableName);
 
 void error(char* msg, MYSQL* mysql);
+
+
+int count(MYSQL* mysql, char* tableName, char* condition);
+int newStream(MYSQL* mysql, char* streamName);
+int addUser(MYSQL* mysql, char* streamName, char* userID);
+int removeUser(MYSQL* mysql, char* streamName, char* userID);
+
+
 
 
 /******************

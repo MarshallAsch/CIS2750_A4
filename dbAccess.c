@@ -82,6 +82,7 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	query = strduplicate("INSERT INTO ");
 	query = join(query, tableName);
 
+	query = join(query, " (");
 
 	/* enter the column name */
 	for (i = 0; i < numData - 1; i++)
@@ -90,7 +91,7 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 		query = join(query, ", ");
 	}
 	query = join(query, field[numData - 1]);
-	query = join(query, ") VALUES (");
+	query = join(query, ") VALUES (\"");
 
 
 	/* enter the values */
@@ -98,10 +99,10 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	{
 		query = join(query, value[i]);
 
-		query = join(query, ", ");
+		query = join(query, "\", \"");
 	}
 	query = join(query, value[numData - 1]);
-	query = joinC(query, ')');
+	query = join(query, "\")");
 
 
 	/* mysql_query returns 0 on success */
@@ -156,7 +157,7 @@ int update(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	return 0;
 }
 
-int clearTable(MYSQL* mysql, char* tableName)
+int deleteFromTable(MYSQL* mysql, char* tableName, char* condition)
 {
 	char* query;
 
@@ -166,8 +167,14 @@ int clearTable(MYSQL* mysql, char* tableName)
 		return -1;
 	}
 
-	query = strduplicate("DELETE * FROM ");
+	query = strduplicate("DELETE FROM ");
 	query = join(query, tableName);
+
+	if (condition != NULL)
+	{
+		query = join(query, " WHERE ");
+		query = join(query, condition);
+	}
 
 
 	/* mysql_query returns 0 on success */
@@ -182,7 +189,7 @@ int clearTable(MYSQL* mysql, char* tableName)
 	return 0;
 }
 
-int deleteTable(MYSQL* mysql, char* tableName)
+int dropTable(MYSQL* mysql, char* tableName)
 {
 	char* query;
 
@@ -209,11 +216,175 @@ int deleteTable(MYSQL* mysql, char* tableName)
 }
 
 
+int newStream(MYSQL* mysql, char* streamName)
+{
+	char* condition;
+	int num;
+	/* make sure that param are valid */
+	if (mysql == NULL || streamName == NULL)
+	{
+		return -1;
+	}
+
+	/* check to see if the stream already exists */
+	condition = strduplicate("stream_name = \"");
+	condition = join(condition, streamName);
+	condition = join(condition, "\"");
+
+	num = count(mysql, "streams", condition);
+	free(condition);
+
+	char* namesStreams[] = {"stream_name", "num_posts"};
+	char* data[] = {streamName, "0"};
+
+	/* if it does not exist then add it */
+	if (num == 1)
+	{
+		return 0;
+	}
+	else if (num == 0)
+	{
+		return insert(mysql, "streams", 2, namesStreams, data);
+	}
+	else
+	{
+		return num;
+	}
+}
+
+
+
+int addUser(MYSQL* mysql, char* streamName, char* userID)
+{
+	char* condition;
+	int num;
+	/* make sure that param are valid */
+	if (mysql == NULL || streamName == NULL || userID == NULL)
+	{
+		return -1;
+	}
+
+	/* check to see if the user is already in the stream */
+	condition = strduplicate("stream_name = \"");
+	condition = join(condition, streamName);
+	condition = join(condition, "\" AND user_id = \"");
+	condition = join(condition, userID);
+	condition = join(condition, "\"");
+
+	num = count(mysql, "users", condition);
+	free(condition);
+
+	char* namesStreams[] = {"user_id", "stream_name", "num_read"};
+	char* data[] = {userID, streamName, "0"};
+
+	/* if it does not exist then add it */
+	if (num == 1)
+	{
+		return 0;
+	}
+	else if (num == 0)
+	{
+		return insert(mysql, "users", 3, namesStreams, data);
+	}
+	else
+	{
+		return num;
+	}
+}
+
+int removeUser(MYSQL* mysql, char* streamName, char* userID)
+{
+	char* condition;
+	int status;
+
+	/* make sure that param are valid */
+	if (mysql == NULL || streamName == NULL || userID == NULL)
+	{
+		return -1;
+	}
+
+	condition = strduplicate("user_id = \"");
+	condition = join(condition, userID);
+	condition = join(condition, "\" AND stream_name = \"");
+	condition = join(condition, streamName);
+	condition = join(condition, "\"");
+
+	/* add the user to the if they were not already there */
+	status = deleteFromTable(mysql, "users", condition);
+	free(condition);
+
+	return status;
+}
+
+
+int count(MYSQL * mysql, char* tableName, char* condition)
+{
+	char* query;
+	MYSQL_RES* results;
+	MYSQL_ROW  row;
+	int num;
+
+	/* make sure that param are valid */
+	if (mysql == NULL || tableName == NULL)
+	{
+		return -1;
+	}
+
+	query = strduplicate("SELECT COUNT(*) FROM ");
+	query = join(query, tableName);
+
+	if (condition != NULL)
+	{
+		query = join(query, " WHERE ");
+		query = join(query, condition);
+	}
+
+	if (mysql_query(mysql, query) != 0)
+	{
+		error("failed to perform the query", mysql);
+		free(query);
+		return -2;
+	}
+	free(query);
+
+
+	/* store the results of the query */
+	if (!(results = mysql_store_result(mysql)))
+	{
+		error("failed to load the data.", mysql);
+		return -3;
+	}
+
+	/* print the userIDs */
+	while ((row = mysql_fetch_row(results)))
+	{
+		printf("%s\n", row[0]);
+	}
+
+	/* make sure there is only 1 result row */
+	if (mysql_num_rows(results) != 1)
+	{
+		mysql_free_result(results);
+		return -4;
+	}
+
+	/* get the number from the results */
+	row = mysql_fetch_row(results);
+	num = atoi(row[0]);
+
+	mysql_free_result(results);
+
+
+	return num;
+}
+
+
+
 /**
  * Prints the error message
  *
  */
-void error(char* msg, MYSQL* mysql)
+void error(char* msg, MYSQL * mysql)
 {
 	fprintf(stderr, "%s\n%s\n", msg, mysql_error(mysql));
 }
@@ -321,7 +492,7 @@ SQL_result* newResult(int numRows, int numFields)
 	}
 
 	/* allocate memory */
-	data = malloc(sizeof(void*) * (result->numRows + 1));
+	data = malloc(sizeof(void*) * (numRows + 1));
 	if (data == NULL)
 	{
 		free(result);
@@ -350,7 +521,7 @@ SQL_result* newResult(int numRows, int numFields)
 
 ********************/
 
-void freeUserResults(SQL_users_result* result)
+void freeUserResults(SQL_users_result * result)
 {
 	/* make sure the parameter is valid */
 	if (result == NULL)
@@ -363,7 +534,7 @@ void freeUserResults(SQL_users_result* result)
 	free(result);
 }
 
-void freeStreamResults(SQL_streams_result* result)
+void freeStreamResults(SQL_streams_result * result)
 {
 	/* make sure the parameter is valid */
 	if (result == NULL)
@@ -375,7 +546,7 @@ void freeStreamResults(SQL_streams_result* result)
 	free(result);
 }
 
-void freePostResults(SQL_post_result* result)
+void freePostResults(SQL_post_result * result)
 {
 	/* make sure the parameter is valid */
 	if (result == NULL)
@@ -391,7 +562,7 @@ void freePostResults(SQL_post_result* result)
 }
 
 
-void addData(SQL_result* result, void* next)
+void addData(SQL_result * result, void* next)
 {
 	/* make sure the parameters are valid */
 	if (result == NULL || result->data == NULL || next == NULL)
@@ -406,7 +577,7 @@ void addData(SQL_result* result, void* next)
 
 
 
-SQL_result* getUserStreams(MYSQL* mysql, char* userID)
+SQL_result* getUserStreams(MYSQL * mysql, char* userID)
 {
 	char* query;
 	SQL_result* result;
@@ -415,6 +586,7 @@ SQL_result* getUserStreams(MYSQL* mysql, char* userID)
 	MYSQL_RES* res;
 	MYSQL_ROW  row;
 
+	users = NULL;
 	/* check the parameters */
 	if (mysql == NULL || userID == NULL)
 	{
@@ -449,11 +621,13 @@ SQL_result* getUserStreams(MYSQL* mysql, char* userID)
 		users = newUserResult(row[0], row[1], row[2], row[3]);
 		addData(result, users);
 	}
+
+	mysql_free_result(res);
 	return result;
 }
 
 
-SQL_result* getStreamPosts(MYSQL* mysql, char* stream)
+SQL_result* getStreamPosts(MYSQL * mysql, char* stream)
 {
 	char* query;
 	SQL_result* result;
@@ -496,6 +670,7 @@ SQL_result* getStreamPosts(MYSQL* mysql, char* stream)
 		post = newPostResult(row[0], row[2], row[1], row[3], row[4]);
 		addData(result, post);
 	}
+	mysql_free_result(res);
 	return result;
 }
 
