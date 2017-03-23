@@ -62,29 +62,29 @@ typedef struct SQL_streams_result
 
 MYSQL* initSQL();
 
-int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** type);
+int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char** type);
 
-int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** value);
+int insert_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value);
 
-int update(MYSQL* mysql, char* tableName, int numData, char** field, char** value);
+int update_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value);
 
-int deleteFromTable(MYSQL* mysql, char* tableName, char* condition);
+int deleteFromTable_DB(MYSQL* mysql, char* tableName, char* condition);
 
-int dropTable(MYSQL* mysql, char* tableName);
+int dropTable_DB(MYSQL* mysql, char* tableName);
 
 void error(char* msg, MYSQL* mysql);
 
 
-int count(MYSQL* mysql, char* tableName, char* condition);
-int newStream(MYSQL* mysql, char* streamName);
-int addUser(MYSQL* mysql, char* streamName, char* userID);
-int removeUser(MYSQL* mysql, char* streamName, char* userID);
+int count_DB(MYSQL* mysql, char* tableName, char* condition);
+int newStream_DB(MYSQL* mysql, char* streamName);
+int addUser_DB(MYSQL* mysql, char* streamName, char* userID);
+int removeUser_DB(MYSQL* mysql, char* streamName, char* userID);
 
-int getNumPosts(MYSQL * mysql, char* streamName);
-int markAllRead(MYSQL * mysql, char* streamName, char* userID);
-int markOneRead(MYSQL * mysql, char* streamName, char* userID);
+int getNumPosts_DB(MYSQL * mysql, char* streamName);
+int markAllRead_DB(MYSQL * mysql, char* streamName, char* userID);
+int markOneRead_DB(MYSQL * mysql, char* streamName, char* userID);
 
-int getNumRead(MYSQL * mysql, char* streamName, char* userID);
+int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID);
 
 
 
@@ -121,9 +121,9 @@ void freePostResults(SQL_post_result* result);
 
 void addData(SQL_result* result, void* next);
 
-SQL_result* getUserStreams(MYSQL* mysql, char* userID);
+SQL_result* getUserStreams_DB(MYSQL* mysql, char* userID);
 
-SQL_result* getStreamPosts(MYSQL* mysql, char* stream);
+SQL_result* getStreamPosts_DB(MYSQL* mysql, char* stream);
 
 
 

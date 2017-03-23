@@ -12,6 +12,7 @@ changeLog:
 
 ****************************************************************************/
 
+#include "dbAccess.h"
 #include "stream.h"
 
 
@@ -23,9 +24,11 @@ changeLog:
  * POST: all the memory is freed
  * ERROR: none
  */
-void destroyPost(struct userPost * post) {
+void destroyPost(struct userPost * post)
+{
 	/* check that all the parameters are valid */
-	if (post == NULL) {
+	if (post == NULL)
+	{
 		return;
 	}
 
@@ -46,7 +49,8 @@ void destroyPost(struct userPost * post) {
  * POST: files are created if nesisay, the files are modified
  * ERROR: returns if the parameters are invalid
  */
-void updateStream(struct userPost *st) {
+void updateStream(struct userPost *st)
+{
 	FILE* stream;			/* file that contains the posts*/
 	FILE* streamData;		/* file that contains the start byte of each post*/
 
@@ -72,7 +76,8 @@ void updateStream(struct userPost *st) {
 	free(baseName);
 
 	/* if the files exist then write the post to the file*/
-	if (stream != NULL && streamData != NULL) {
+	if (stream != NULL && streamData != NULL)
+	{
 		/* get the position and write it to the data file */
 		filePos = ftell(stream);
 		fprintf(streamData, "%d\n", filePos);
@@ -99,55 +104,61 @@ void updateStream(struct userPost *st) {
  * POST: files are created if nesisay, the files are modified
  * ERROR: returns if the parameters are invalid
  */
-void addUser(char *username, char *list) {
+void addUser(char *username, char *list)
+{
 	/* adds a user with the given user name to all of the sreams in the list*/
 	StringList * streamList;
 	StringList * temp;
-	char * fileName;
-	FILE* streamUsers;
+
+	MYSQL* mysql;
 
 	int status;
 
 	/* make sure the parameters are valid */
-	if (list == NULL || username == NULL) {
+	if (list == NULL || username == NULL)
+	{
+		return;
+	}
+
+	/* connect to the mysql database */
+	mysql = initSQL();
+	if (mysql == NULL)
+	{
 		return;
 	}
 
 	streamList = parseList(list);
 
 	/* something went wrong or none were given */
-	if (streamList == NULL) {
+	if (streamList == NULL)
+	{
+		mysql_close(mysql);
 		return;
 	}
 
 	temp = streamList;
 
 	/* loop through every name in the list */
-	while (temp != NULL) {
+	while (temp != NULL)
+	{
 		createFiles(temp->str);
-		status = checkPermissions(temp->str, username);
+		status = addUser_DB(mysql, temp->str, username);
 
 		/* check if the user already has permission to veiew a stream */
-		if (status >= 0 ) {
+		if (status >= 0 )
+		{
 			fprintf(stderr, "User [%s] already has permission in stream [%s]\n", username, temp->str);
-		} else if (status == -3) {
-			/* generate the file name */
-			fileName = strduplicate("messages/");
-			fileName = join(fileName, temp->str);
-			fileName = join(fileName, "StreamUsers");
+		}
+		else if (status == -3)
+		{
+			fprintf(stderr, "User [%s] added to stream [%s]\n", username, temp->str);
 
-			streamUsers = fopen(fileName, "a");
-
-			/* add the users name to the file*/
-			fprintf(streamUsers, "%s 0\n", username);
-
-			fclose(streamUsers);
-			free(fileName);
 		}
 		temp = temp->next;
 	}
 
 	destroyStringList(streamList);
+	mysql_close(mysql);
 }
 
 /**
@@ -165,7 +176,8 @@ void addUser(char *username, char *list) {
  * POST: the files are modified
  * ERROR: returns if the parameters are invalid
  */
-void removeUser(char *username, char *list) {
+void removeUser(char *username, char *list)
+{
 	/* adds a user with the given user name to all of the sreams in the list*/
 	StringList * streamList;
 	StringList * fileData;
@@ -181,31 +193,41 @@ void removeUser(char *username, char *list) {
 	int status;
 
 	/* make sure the parameters are valid */
-	if (list == NULL || username == NULL) {
+	if (list == NULL || username == NULL)
+	{
 		return;
 	}
 
 	streamList = parseList(list);
 
 	/* something went wrong or none were given */
-	if (streamList == NULL) {
+	if (streamList == NULL)
+	{
 		return;
 	}
 
 	temp = streamList;
 
 	/* loop through every name in the list */
-	while (temp != NULL) {
+	while (temp != NULL)
+	{
 		status = checkPermissions(temp->str, username);
 
 		/* check if the user already has permission to veiew a stream */
-		if (status == -2) {
+		if (status == -2)
+		{
 			fprintf(stderr, "The stream [%s] does not exist.\n", temp->str);
-		} else if (status == -3) {
+		}
+		else if (status == -3)
+		{
 			fprintf(stderr, "The user [%s] does not have permission in stream [%s].\n", username, temp->str);
-		} else if (status == -1) {
+		}
+		else if (status == -1)
+		{
 			fprintf(stderr, "Error something went wrong checking permission for the stream [%s]\n", temp->str);
-		} else {
+		}
+		else
+		{
 			/* generate the file name */
 			fileName = strduplicate("messages/");
 			fileName = join(fileName, temp->str);
@@ -215,9 +237,11 @@ void removeUser(char *username, char *list) {
 			fileData = NULL;
 
 			/* does not do any input buffering/ checking*/
-			while ((lineBuff = trim(fgetstr(streamUsers)))) {
+			while ((lineBuff = trim(fgetstr(streamUsers))))
+			{
 				/* make sure it was successful reading the line */
-				if (lineBuff == NULL) {
+				if (lineBuff == NULL)
+				{
 					break;
 				}
 
@@ -225,7 +249,8 @@ void removeUser(char *username, char *list) {
 				pos = lastIndex(lineBuff, ' ');
 
 				/* make sure that the line has valid data */
-				if (pos == -1) {
+				if (pos == -1)
+				{
 					break;
 				}
 
@@ -233,7 +258,8 @@ void removeUser(char *username, char *list) {
 				name = trim(substring(lineBuff, 0, pos));
 
 				/* check to see if the the row does not match username */
-				if (strcmp(name, username) != 0) {
+				if (strcmp(name, username) != 0)
+				{
 					fileData = addToStringList(fileData, newStringList(lineBuff));
 				}
 
@@ -245,10 +271,12 @@ void removeUser(char *username, char *list) {
 			fclose(streamUsers);
 			streamUsers = fopen(fileName, "w");
 
-			if (streamUsers != NULL) {
+			if (streamUsers != NULL)
+			{
 				/* print the data to the file */
 				tempFile = fileData;
-				while (tempFile != NULL) {
+				while (tempFile != NULL)
+				{
 					fprintf(streamUsers, "%s\n", tempFile->str);
 					tempFile = tempFile->next;
 				}
@@ -274,12 +302,14 @@ void removeUser(char *username, char *list) {
  * POST: The file is opened and closed if it exists
  * ERROR: FALSE is returned if the streamName is NULL
  */
-bool checkStream(char* streamName) {
+bool checkStream(char* streamName)
+{
 	FILE* stream;
 	char* fileName;
 
 	/* check parameters */
-	if (streamName == NULL) {
+	if (streamName == NULL)
+	{
 		return FALSE;
 	}
 
@@ -293,7 +323,8 @@ bool checkStream(char* streamName) {
 	free(fileName);
 
 	/* then the file does not exist and create a new stream */
-	if (stream == NULL) {
+	if (stream == NULL)
+	{
 		return FALSE;
 	}
 
@@ -317,7 +348,8 @@ bool checkStream(char* streamName) {
  * POST: The file is opened and closed if it exists
  * ERROR: -1 is returned if there is an error.
  */
-int checkPermissions(char* streamName, char* userID) {
+int checkPermissions(char* streamName, char* userID)
+{
 	FILE* streamUsers;
 	char* fileName;
 	char* lineBuff;
@@ -327,7 +359,8 @@ int checkPermissions(char* streamName, char* userID) {
 	int pos;
 
 	/* check the parameter list */
-	if (streamName == NULL || userID == NULL) {
+	if (streamName == NULL || userID == NULL)
+	{
 		return -1;
 	}
 
@@ -340,14 +373,17 @@ int checkPermissions(char* streamName, char* userID) {
 	free(fileName);
 
 	/* if the stream does not exist */
-	if (streamUsers == NULL) {
+	if (streamUsers == NULL)
+	{
 		return -2;
 	}
 
 	/* does not do any input buffering/ checking*/
-	while ((lineBuff = trim(fgetstr(streamUsers)))) {
+	while ((lineBuff = trim(fgetstr(streamUsers))))
+	{
 		/* make sure it was successful reading the line */
-		if (lineBuff == NULL) {
+		if (lineBuff == NULL)
+		{
 			break;
 		}
 
@@ -355,7 +391,8 @@ int checkPermissions(char* streamName, char* userID) {
 		pos = lastIndex(lineBuff, ' ');
 
 		/* make sure that the line has valid data */
-		if (pos == -1) {
+		if (pos == -1)
+		{
 			break;
 		}
 		/* seperate the strings into name and value */
@@ -367,7 +404,8 @@ int checkPermissions(char* streamName, char* userID) {
 		free(numBuff);
 
 		/* check to see if the user ID matches*/
-		if (strcmp(name, userID) == 0) {
+		if (strcmp(name, userID) == 0)
+		{
 			free(name);
 			fclose(streamUsers);
 			return numRead;
@@ -389,13 +427,15 @@ int checkPermissions(char* streamName, char* userID) {
  * POST: 3 files are created if they do not exist
  * ERROR: nothing happens if the filename is invalid.
  */
-void createFiles(char* streamName) {
+void createFiles(char* streamName)
+{
 	char* fileName;
 	char* baseName;
 	FILE* file;
 
 	/* make sure the parameters are given */
-	if (streamName == NULL) {
+	if (streamName == NULL)
+	{
 		return;
 	}
 
@@ -439,7 +479,8 @@ void createFiles(char* streamName) {
  * POST: a linked list structure is created
  * ERROR: NULL if the list is invalid
  */
-StringList* parseList(char* list) {
+StringList* parseList(char* list)
+{
 	char* streamName;
 
 	StringList* streamList;
@@ -449,7 +490,8 @@ StringList* parseList(char* list) {
 	int end;
 
 	/* make sure that the list given is valid */
-	if (list == NULL) {
+	if (list == NULL)
+	{
 		return NULL;
 	}
 
@@ -460,13 +502,15 @@ StringList* parseList(char* list) {
 	streamList = NULL;
 
 	/* loop untill there are no more streams in the list */
-	while (end != -1) {
+	while (end != -1)
+	{
 		/* get the end index of the stream name */
 		end = firstIndexOffset(list, ',', start);
 
 
 		/* then this token is the last token */
-		if (end == -1) {
+		if (end == -1)
+		{
 			streamName = trim(substring(list, start, strlen(list) - 1));
 			stream = newStringList(streamName);
 

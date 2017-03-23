@@ -183,8 +183,8 @@ out/typeCheck.o: typeCheck.c
 lib/libmystr.a: out/mystring.o
 	ar cr $@ $<
 
-lib/libstream.a: out/stream.o
-	ar cr $@ $<
+lib/libstream.a: out/stream.o out/dbAccess.o
+	ar cr $@ $^
 
 
 out/stream.o: stream.c

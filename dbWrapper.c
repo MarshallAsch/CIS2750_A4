@@ -83,7 +83,7 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* get the data */
-	result = getUserStreams(mysql, userID);
+	result = getUserStreams_DB(mysql, userID);
 
 	mysql_close(mysql);
 
@@ -108,10 +108,10 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 
 	mysql = initSQL();
 
-	numRead = getNumRead(mysql, stream, userID);
+	numRead = getNumRead_DB(mysql, stream, userID);
 
 	/* get the data */
-	result = getStreamPosts(mysql, stream);
+	result = getStreamPosts_DB(mysql, stream);
 
 	mysql_close(mysql);
 
@@ -140,7 +140,7 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* create the new stream */
-	status = newStream(mysql, stream);
+	status = newStream_DB(mysql, stream);
 	if (status != 0)
 	{
 		mysql_close(mysql);
@@ -148,7 +148,7 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	}
 
 	/* add the user to the if they were not already there */
-	status = addUser(mysql, stream, userID);
+	status = addUser_DB(mysql, stream, userID);
 	mysql_close(mysql);
 
 	return Py_BuildValue("i", status);
@@ -174,7 +174,7 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* add the user to the if they were not already there */
-	status = removeUser(mysql, stream, userID);
+	status = removeUser_DB(mysql, stream, userID);
 
 	mysql_close(mysql);
 
@@ -200,7 +200,7 @@ static PyObject* db_markAll(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* add the user to the if they were not already there */
-	status = markAllRead(mysql, stream, userID);
+	status = markAllRead_DB(mysql, stream, userID);
 
 	mysql_close(mysql);
 
@@ -226,7 +226,7 @@ static PyObject* db_markOne(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* add the user to the if they were not already there */
-	status = markOneRead(mysql, stream, userID);
+	status = markOneRead_DB(mysql, stream, userID);
 
 	mysql_close(mysql);
 
@@ -250,7 +250,7 @@ static PyObject* db_newStream(PyObject *self, PyObject *args)
 	mysql = initSQL();
 
 	/* add the user to the if they were not already there */
-	status = newStream(mysql, stream);
+	status = newStream_DB(mysql, stream);
 
 	mysql_close(mysql);
 

@@ -273,9 +273,9 @@ int clearAll(MYSQL* mysql)
 		return -1;
 	}
 
-	deleteFromTable(mysql, "users", NULL);
-	deleteFromTable(mysql, "streams", NULL);
-	deleteFromTable(mysql, "posts", NULL);
+	deleteFromTable_DB(mysql, "users", NULL);
+	deleteFromTable_DB(mysql, "streams", NULL);
+	deleteFromTable_DB(mysql, "posts", NULL);
 	return 0;
 }
 
@@ -288,9 +288,9 @@ int deleteAll(MYSQL* mysql)
 		return -1;
 	}
 
-	dropTable(mysql, "users");
-	dropTable(mysql, "streams");
-	dropTable(mysql, "posts");
+	dropTable_DB(mysql, "users");
+	dropTable_DB(mysql, "streams");
+	dropTable_DB(mysql, "posts");
 	return 0;
 }
 
@@ -315,7 +315,7 @@ int createAllTables(MYSQL* mysql)
 	char* typesPosts[] = {"TEXT", "TEXT", "DATETIME", "TEXT"};
 
 	/* try to create the users table */
-	status = createTable(mysql, "users", 3, namesUsers, typesUsers);
+	status = createTable_DB(mysql, "users", 3, namesUsers, typesUsers);
 	if (status != 0)
 	{
 		printf("Failed to create the users table.\n");
@@ -323,7 +323,7 @@ int createAllTables(MYSQL* mysql)
 	}
 
 	/* try to create the posts table */
-	status = createTable(mysql, "posts", 4, namesPosts, typesPosts);
+	status = createTable_DB(mysql, "posts", 4, namesPosts, typesPosts);
 	if (status != 0)
 	{
 		printf("Failed to create the posts table.\n");
@@ -331,7 +331,7 @@ int createAllTables(MYSQL* mysql)
 	}
 
 	/* try to create the streams table */
-	status = createTable(mysql, "streams", 2, namesStreams, typesStreams);
+	status = createTable_DB(mysql, "streams", 2, namesStreams, typesStreams);
 	if (status != 0)
 	{
 		printf("Failed to create the streams table.\n");

@@ -25,7 +25,7 @@ MYSQL* initSQL()
 }
 
 
-int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** type)
+int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char** type)
 {
 	int i;				/* loop var */
 	char* query;
@@ -67,7 +67,7 @@ int createTable(MYSQL* mysql, char* tableName, int numCol, char** name, char** t
 	return 0;
 }
 
-int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
+int insert_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
 {
 	int i;				/* loop var */
 	char* query;
@@ -117,7 +117,7 @@ int insert(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	return 0;
 }
 
-int update(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
+int update_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
 {
 	int i;				/* loop var */
 	char* query;
@@ -157,7 +157,7 @@ int update(MYSQL* mysql, char* tableName, int numData, char** field, char** valu
 	return 0;
 }
 
-int deleteFromTable(MYSQL* mysql, char* tableName, char* condition)
+int deleteFromTable_DB(MYSQL* mysql, char* tableName, char* condition)
 {
 	char* query;
 
@@ -189,7 +189,7 @@ int deleteFromTable(MYSQL* mysql, char* tableName, char* condition)
 	return 0;
 }
 
-int dropTable(MYSQL* mysql, char* tableName)
+int dropTable_DB(MYSQL* mysql, char* tableName)
 {
 	char* query;
 
@@ -216,7 +216,7 @@ int dropTable(MYSQL* mysql, char* tableName)
 }
 
 
-int newStream(MYSQL* mysql, char* streamName)
+int newStream_DB(MYSQL* mysql, char* streamName)
 {
 	char* condition;
 	int num;
@@ -231,7 +231,7 @@ int newStream(MYSQL* mysql, char* streamName)
 	condition = join(condition, streamName);
 	condition = join(condition, "\"");
 
-	num = count(mysql, "streams", condition);
+	num = count_DB(mysql, "streams", condition);
 	free(condition);
 
 	char* namesStreams[] = {"stream_name", "num_posts"};
@@ -240,21 +240,34 @@ int newStream(MYSQL* mysql, char* streamName)
 	/* if it does not exist then add it */
 	if (num == 1)
 	{
-		return 0;
+		/* it exists*/
+		return 1;
 	}
 	else if (num == 0)
 	{
-		return insert(mysql, "streams", 2, namesStreams, data);
+		/* status of the insert*/
+		return insert_DB(mysql, "streams", 2, namesStreams, data);
 	}
 	else
 	{
+		/* error counting the streams */
 		return num;
 	}
 }
 
 
 
-int addUser(MYSQL* mysql, char* streamName, char* userID)
+/**
+ * [addUser description]
+ *
+ * @param  mysql      [description]
+ * @param  streamName [description]
+ * @param  userID     [description]
+ * @return 0 		  On success added
+ *         >0		  If the user is already in the stream
+ *         <0		  On error
+ */
+int addUser_DB(MYSQL* mysql, char* streamName, char* userID)
 {
 	char* condition;
 	int num;
@@ -271,28 +284,31 @@ int addUser(MYSQL* mysql, char* streamName, char* userID)
 	condition = join(condition, userID);
 	condition = join(condition, "\"");
 
-	num = count(mysql, "users", condition);
+	num = count_DB(mysql, "users", condition);
 	free(condition);
 
 	char* namesStreams[] = {"user_id", "stream_name", "num_read"};
 	char* data[] = {userID, streamName, "0"};
 
-	/* if it does not exist then add it */
-	if (num == 1)
+
+	if (num > 0)
 	{
-		return 0;
+		/* if the user is alreay in the stream */
+		return 1;
 	}
 	else if (num == 0)
 	{
-		return insert(mysql, "users", 3, namesStreams, data);
+		/* status of insert*/
+		return insert_DB(mysql, "users", 3, namesStreams, data);
 	}
 	else
 	{
+		/* error code */
 		return num;
 	}
 }
 
-int removeUser(MYSQL* mysql, char* streamName, char* userID)
+int removeUser_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* condition;
 	int status;
@@ -310,14 +326,14 @@ int removeUser(MYSQL* mysql, char* streamName, char* userID)
 	condition = join(condition, "\"");
 
 	/* add the user to the if they were not already there */
-	status = deleteFromTable(mysql, "users", condition);
+	status = deleteFromTable_DB(mysql, "users", condition);
 	free(condition);
 
 	return status;
 }
 
 
-int count(MYSQL * mysql, char* tableName, char* condition)
+int count_DB(MYSQL * mysql, char* tableName, char* condition)
 {
 	char* query;
 	MYSQL_RES* results;
@@ -374,7 +390,7 @@ int count(MYSQL * mysql, char* tableName, char* condition)
 
 
 
-int markAllRead(MYSQL * mysql, char* streamName, char* userID)
+int markAllRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
 	int numPosts;
@@ -387,7 +403,7 @@ int markAllRead(MYSQL * mysql, char* streamName, char* userID)
 	}
 
 	/* get the number of posts in the stream */
-	numPosts = getNumPosts(mysql, streamName);
+	numPosts = getNumPosts_DB(mysql, streamName);
 	if (numPosts < 0)
 	{
 		return numPosts;
@@ -415,7 +431,7 @@ int markAllRead(MYSQL * mysql, char* streamName, char* userID)
 	return 0;
 }
 
-int markOneRead(MYSQL * mysql, char* streamName, char* userID)
+int markOneRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
 	int numPosts;
@@ -428,7 +444,7 @@ int markOneRead(MYSQL * mysql, char* streamName, char* userID)
 	}
 
 	/* get the number of posts in the stream */
-	numPosts = getNumPosts(mysql, streamName);
+	numPosts = getNumPosts_DB(mysql, streamName);
 	if (numPosts < 0)
 	{
 		return numPosts;
@@ -455,7 +471,7 @@ int markOneRead(MYSQL * mysql, char* streamName, char* userID)
 	return 0;
 }
 
-int getNumPosts(MYSQL * mysql, char* streamName)
+int getNumPosts_DB(MYSQL * mysql, char* streamName)
 {
 	char* query;
 	MYSQL_RES* results;
@@ -507,7 +523,7 @@ int getNumPosts(MYSQL * mysql, char* streamName)
 }
 
 
-int getNumRead(MYSQL * mysql, char* streamName, char* userID)
+int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
 	MYSQL_RES* results;
@@ -758,7 +774,7 @@ void addData(SQL_result * result, void* next)
 
 
 
-SQL_result* getUserStreams(MYSQL * mysql, char* userID)
+SQL_result* getUserStreams_DB(MYSQL * mysql, char* userID)
 {
 	char* query;
 	SQL_result* result;
@@ -808,7 +824,7 @@ SQL_result* getUserStreams(MYSQL * mysql, char* userID)
 }
 
 
-SQL_result* getStreamPosts(MYSQL * mysql, char* stream)
+SQL_result* getStreamPosts_DB(MYSQL * mysql, char* stream)
 {
 	char* query;
 	SQL_result* result;
