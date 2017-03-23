@@ -355,12 +355,6 @@ int count(MYSQL * mysql, char* tableName, char* condition)
 		return -3;
 	}
 
-	/* print the userIDs */
-	while ((row = mysql_fetch_row(results)))
-	{
-		printf("%s\n", row[0]);
-	}
-
 	/* make sure there is only 1 result row */
 	if (mysql_num_rows(results) != 1)
 	{

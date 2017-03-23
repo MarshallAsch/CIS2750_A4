@@ -130,20 +130,14 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	if (status != 0)
 	{
 		mysql_close(mysql);
-		return Py_BuildValue("p", 0);
+		return Py_BuildValue("i", status);
 	}
 
 	/* add the user to the if they were not already there */
 	status = addUser(mysql, stream, userID);
 	mysql_close(mysql);
 
-	if (status != 0)
-	{
-		return Py_BuildValue("p", 0);
-	}
-
-	/* return a true object on success */
-	return Py_BuildValue("p", 1);
+	return Py_BuildValue("i", status);
 }
 
 
@@ -170,12 +164,7 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 
 	mysql_close(mysql);
 
-	if (status != 0)
-	{
-		return Py_BuildValue("p", 0);
-	}
-	/* return a true object on success */
-	return Py_BuildValue("p", 1);
+	return Py_BuildValue("i", status);
 }
 
 
@@ -200,12 +189,7 @@ static PyObject* db_newStream(PyObject *self, PyObject *args)
 
 	mysql_close(mysql);
 
-	if (status != 0)
-	{
-		return Py_BuildValue("p", 0);
-	}
-	/* return a true object on success */
-	return Py_BuildValue("p", 1);
+	return Py_BuildValue("i", status);
 }
 
 
