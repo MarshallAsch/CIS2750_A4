@@ -37,7 +37,7 @@ int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char*
 	}
 
 	/* create the query */
-	query = strduplicate("CREATE TABLE ");
+	query = strduplicate("CREATE TABLE IF NOT EXISTS ");
 	query = join(query, tableName);
 	query = join(query, " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ");
 
@@ -53,7 +53,7 @@ int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char*
 	query = join(query, name[numCol - 1]);
 	query = joinC(query, ' ');
 	query = join(query, type[numCol - 1]);
-	query = joinC(query, ')');
+	query = join(query, ") CHARACTER SET utf8 COLLATE utf8_bin");
 
 	/* mysql_query returns 0 on success */
 	if (mysql_query(mysql, query) != 0)

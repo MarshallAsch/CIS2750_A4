@@ -7,16 +7,6 @@ Assignment: A4
 ****************************************************************************/
 
 
-/*
-tables:
-	users (ID userName streamName numRead)
-
-	streams (ID streamName numPosts)
-
-	posts (ID streamName userName date text)
-
-*/
-
 #include <mysql/mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,7 +38,6 @@ int main(int argc, char const *argv[])
 		usage();
 		return -1;
 	}
-
 
 	/* initilize connection to the database */
 	mysql = initSQL();

@@ -1,20 +1,51 @@
-A1_OBJ =  out/C++lite.o out/tokenStruct.o out/list.o out/lists.o out/typeCheck.o 
-LIBRARIES = lib/libmystr.a lib/libstream.a
-postOBJ = out/post.o out/input.o 
-addAuthorOBJ = out/addauthor.o out/input.o 
-delAuthorOBJ = out/removeauthor.o out/input.o 
-authOBJ = out/authenticateUser.o out/input.o 
-HTML_OBJ = out/genHTML.o out/fieldList.o
-db_OBJ = out/db.o out/dbAccess.o
+BUILD_DIR = out
+LIB_DIR = lib
+INCLUDE_DIR =
 
-LIBS = -Llib -lmystr -lstream
+
+# lists of .c files
+MY_LIB_SRC = mystring.c input.c
+STREAM_LIB_SRC = stream.c dbAccess.c
+
+A1_SRC = C++lite.c tokenStruct.c list.c lists.c typeCheck.c
+POST_SRC = post.c
+ADD_AUTHOR_SRC = addauthor.c
+DEL_AUTHOR_SRC = removeauthor.c
+AUTHENTICATE_SRC = authenticateUser.c
+GEN_HTML_SRC = genHTML.c fieldList.c
+DATA_BASE_SRC = db.c
+DB_ACCESS_SRC = dbAccess.c
+
+
+# lists of .o files
+A1_OBJ =  $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(A1_SRC)))
+POST_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(POST_SRC)))
+ADD_AUTHOR_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(ADD_AUTHOR_SRC)))
+DEL_AUTHOR_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(DEL_AUTHOR_SRC)))
+AUTHENTICATE_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(AUTHENTICATE_SRC)))
+GEN_HTML_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(GEN_HTML_SRC)))
+DATA_BASE_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(DATA_BASE_SRC)))
+DB_ACCESS_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(DB_ACCESS_SRC)))
+MY_LIB_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(MY_LIB_SRC)))
+STREAM_LIB_OBJ = $(addprefix $(BUILD_DIR)/, $(patsubst %.c, %.o, $(STREAM_LIB_SRC)))
+
+
+
+# my list of libraries
+LIBRARIES = $(LIB_DIR)/libmylib.a $(LIB_DIR)/libstream.a
+
+# list of all the excecutables to build
+EXECS = db post addauthor genHTML auth removeauthor
+
+
+LIBS = -Llib -lmylib -lstream
 CC = gcc
-CFLAG =  -c -Wall -ansi -g -fPIC
+CFLAG =  -c -Wall -ansi -g  -I$(INCLUDE_DIR) -fPIC
 LFLAG = -lc -lm -lmysqlclient $(LIBS)
 
 
 
-all: db post addauthor genHTML auth removeauthor
+all:  $(EXECS)
 	chmod +x setup.py
 	./setup.py build
 	cp build/lib.*/*.so .
@@ -22,72 +53,39 @@ all: db post addauthor genHTML auth removeauthor
 	chmod +x loadStreams.py
 	chmod +x markOne.py
 	chmod +x markAll.py
+	./db -init
 
 
 
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR DB
 #
-#
 #**********************************
 
-db: lib out $(db_OBJ) $(LIBRARIES)
-	$(CC) $(db_OBJ) -o $@ $(LFLAG)
-
-
-
-out/db.o: db.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/dbAccess.o: dbAccess.c dbAccess.h
-	$(CC) $(CFLAG) $< -o $@
-
-
-
-
+db: $(DB_ACCESS_OBJ) $(DATA_BASE_OBJ) $(LIBRARIES)
+	$(CC) $(DB_ACCESS_OBJ) $(DATA_BASE_OBJ) -o $@ $(LFLAG)
 
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR GENHTML
 #
-#
 #**********************************
 
-genHTML: lib out $(HTML_OBJ) $(LIBRARIES)
-	$(CC) $(HTML_OBJ) -o $@ $(LFLAG)
-
-
-
-out/genHTML.o: genHTML.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/fieldList.o: fieldList.c
-	$(CC) $(CFLAG) $< -o $@
+genHTML: $(GEN_HTML_OBJ)  $(LIBRARIES)
+	$(CC) $(GEN_HTML_OBJ) -o $@ $(LFLAG)
 
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR POST
 #
-#
 #**********************************
 
-post: tmp messages lib out $(postOBJ) $(LIBRARIES)
-	$(CC) $(postOBJ) -o $@ $(LFLAG)
-
-
-
-out/post.o: post.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/input.o: input.c
-	$(CC) $(CFLAG) $< -o $@
+post: $(POST_OBJ) $(LIBRARIES)
+	$(CC) $(POST_OBJ) -o $@ $(LFLAG)
 
 # to convert the C++ into the C using A1
 post.c: a1 post.cc
@@ -95,80 +93,42 @@ post.c: a1 post.cc
 
 #**********************************
 #
-#
 #	BUILDING CODE FOR AUTH
 #
-#
 #**********************************
 
-auth: lib out $(authOBJ) $(LIBRARIES)
-	$(CC) $(authOBJ) -o $@ $(LFLAG)
-
-
-out/authenticateUser.o: authenticateUser.c
-	$(CC) $(CFLAG) $< -o $@
-
+auth: $(AUTHENTICATE_OBJ) $(LIBRARIES)
+	$(CC) $(AUTHENTICATE_OBJ) -o $@ $(LFLAG)
 
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR ADDATHTOR
 #
-#
 #**********************************
 
-addauthor: lib out $(addAuthorOBJ) $(LIBRARIES)
-	$(CC) $(addAuthorOBJ) -o $@ $(LFLAG)
+addauthor: $(ADD_AUTHOR_OBJ) $(LIBRARIES)
+	$(CC) $(ADD_AUTHOR_OBJ) -o $@ $(LFLAG)
 
-
-out/addauthor.o: addauthor.c
-	$(CC) $(CFLAG) $< -o $@
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR REMOVEATHTOR
 #
-#
 #**********************************
 
-removeauthor: lib out $(delAuthorOBJ) $(LIBRARIES)
-	$(CC) $(delAuthorOBJ) -o $@ $(LFLAG)
-
-
-out/removeauthor.o: removeauthor.c
-	$(CC) $(CFLAG) $< -o $@
+removeauthor: $(DEL_AUTHOR_OBJ) $(LIBRARIES)
+	$(CC) $(DEL_AUTHOR_OBJ) -o $@ $(LFLAG)
 
 
 #**********************************
-#
 #
 #	BUILDING CODE FOR A1
 #
-#
 #**********************************
 
-a1: lib out $(A1_OBJ) $(LIBRARIES)
+a1: $(A1_OBJ) $(LIBRARIES)
 	$(CC) $(A1_OBJ) -o $@ $(LFLAG)
-
-
-out/C++lite.o: C++lite.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/tokenStruct.o: tokenStruct.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/list.o: list.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/lists.o: lists.c
-	$(CC) $(CFLAG) $< -o $@
-
-out/typeCheck.o: typeCheck.c
-	$(CC) $(CFLAG) $< -o $@
-
-
 
 
 #**********************************
@@ -180,66 +140,65 @@ out/typeCheck.o: typeCheck.c
 #**********************************
 
 
-lib/libmystr.a: out/mystring.o
-	ar cr $@ $<
-
-lib/libstream.a: out/stream.o out/dbAccess.o
-	ar cr $@ $^
+$(LIB_DIR)/libmylib.a: $(MY_LIB_OBJ) | $(LIB_DIR)
+	ar cr $@ $(MY_LIB_OBJ)
 
 
-out/stream.o: stream.c
-	$(CC) $(CFLAG) $< -o $@
 
+$(LIB_DIR)/libstream.a: $(STREAM_LIB_OBJ) | $(LIB_DIR)
+	ar cr $@ $(STREAM_LIB_OBJ)
 
-out/mystring.o: mystring.c
-	$(CC) $(CFLAG) $< -o $@
 
 
 #**********************************
 #
 #
 #
-#		OTHER STUFF 
+#		OTHER STUFF
 #
 #
 #**********************************
+
+
+#generic build a C file with a header file
+$(BUILD_DIR)/%.o: %.c %.h  | $(BUILD_DIR)
+	$(CC) $(CFLAG) $< -o $@
+
+#generic build a C file with no header file
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAG) $< -o $@
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
+
+$(LIB_DIR):
+	mkdir $(LIB_DIR)
+
+.PHONY: clean
 
 clean:
-	rm -f -r out
-	rm -f -r lib
+	rm -f -r $(BUILD_DIR)
+	rm -f -r $(LIB_DIR)
+	rm -f $(EXECS)
+
 	rm -f -r tmp
-	rm -f -r build
 	rm -f post.c
-	rm -f a1
-	rm -f post
-	rm -f addauthor
-	rm -f genHTML
-	rm -f auth
-	rm -f removeauthor
-	rm -f db
+	rm -f -r build
 	rm -f *.so
 
 
-destroy:
+.PHONY: destroy
+destroy: 
+	make db
+	./db -reset
 	make clean
-	rm -f -r messages
 
-# building the directories 
-out:
-	mkdir out
-
-messages: 
-	mkdir messages
-	chmod 777 messages
 tmp:
 	mkdir tmp
-
-lib:
-	mkdir lib
 
 
 #to package the code to be submitted
 tar:
-	make destroy
-	tar cf a2.tar *.h *.c *.cc *.php *.wpml *.js *.css *.py Makefile README.txt divClose.txt divOpen.txt
-	
+	make clean
+	tar cf a4.tar *.h *.c *.cc *.php *.wpml *.js *.css *.py Makefile README.txt divClose.txt divOpen.txt
+

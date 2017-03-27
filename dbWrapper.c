@@ -336,6 +336,3 @@ static PyObject* genResult_posts(SQL_result* result, int numRead)
 	return obj;
 }
 
-
-
-
