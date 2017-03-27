@@ -133,7 +133,6 @@ void loadStreams(char* userID)
 	MYSQL* mysql;
 	int i;
 
-
 	mysql = initSQL();
 
 	result = getUserStreams_DB(mysql, userID);
@@ -142,9 +141,10 @@ void loadStreams(char* userID)
 	for (i = 0; i < result->numRows; i++)
 	{
 		printf("%s\n", ((SQL_users_result*)(result->data[i]))->stream_name);
+		freeUserResults((SQL_users_result*)(result->data[i]));
 	}
 
-	freeUserResults((SQL_users_result*)result->data);
+	free(result->data);
 	free(result);
 	mysql_close(mysql);
 }
