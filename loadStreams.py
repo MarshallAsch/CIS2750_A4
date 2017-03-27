@@ -10,6 +10,7 @@
 # Will load all of the streams that the user has permission in and
 # print them to the standard out 1 per line
 #
+# depricated
 ##########################################################################
 
 

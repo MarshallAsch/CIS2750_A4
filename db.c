@@ -78,8 +78,9 @@ int main(int argc, char const *argv[])
 		usage();
 		break;
 	default:
+		printf("Invalid option: %s\n", argv[1]);
+		usage();
 		break;
-
 	}
 
 
@@ -170,6 +171,12 @@ int printUsers(MYSQL* mysql)
 		printf("%s\n", row[0]);
 	}
 
+	/* check if the table is empty */
+	if (mysql_num_rows(results) == 0)
+	{
+		printf("table is empty.\n");
+	}
+
 	mysql_free_result(results);
 
 	return 0;
@@ -188,7 +195,7 @@ int printStreams(MYSQL* mysql)
 		return -1;
 	}
 
-	query = strduplicate("SELECT DISTINCT steam_name FROM streams");
+	query = strduplicate("SELECT DISTINCT stream_name FROM streams");
 
 	if (mysql_query(mysql, query) != 0)
 	{
@@ -197,7 +204,6 @@ int printStreams(MYSQL* mysql)
 		return -2;
 	}
 	free(query);
-
 
 	/* store the results of the query */
 	if (!(results = mysql_store_result(mysql)))
@@ -211,8 +217,14 @@ int printStreams(MYSQL* mysql)
 	{
 		printf("%s\n", row[0]);
 	}
-	mysql_free_result(results);
 
+	/* check if the table is empty */
+	if (mysql_num_rows(results) == 0)
+	{
+		printf("table is empty.\n");
+	}
+
+	mysql_free_result(results);
 
 	return 0;
 }
@@ -258,6 +270,12 @@ int printposts(MYSQL* mysql)
 		printf("text: %s\n", row[3]);
 		printf("----------------------------------------\n\n");
 	}
+
+	/* check if the table is empty */
+	if (mysql_num_rows(results) == 0)
+	{
+		printf("table is empty.\n");
+	}
 	mysql_free_result(results);
 
 
@@ -276,6 +294,8 @@ int clearAll(MYSQL* mysql)
 	deleteFromTable_DB(mysql, "users", NULL);
 	deleteFromTable_DB(mysql, "streams", NULL);
 	deleteFromTable_DB(mysql, "posts", NULL);
+
+	printf("Done.\n");
 	return 0;
 }
 
@@ -291,6 +311,8 @@ int deleteAll(MYSQL* mysql)
 	dropTable_DB(mysql, "users");
 	dropTable_DB(mysql, "streams");
 	dropTable_DB(mysql, "posts");
+
+	printf("Done.\n");
 	return 0;
 }
 
@@ -338,6 +360,7 @@ int createAllTables(MYSQL* mysql)
 		return -1;
 	}
 
+	printf("Success.\n");
 	return 0;
 }
 

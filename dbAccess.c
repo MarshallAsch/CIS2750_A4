@@ -277,6 +277,9 @@ int addUser_DB(MYSQL* mysql, char* streamName, char* userID)
 		return -1;
 	}
 
+	/* make sure the stream exists */
+	newStream_DB(mysql, streamName);
+
 	/* check to see if the user is already in the stream */
 	condition = strduplicate("stream_name = \"");
 	condition = join(condition, streamName);
