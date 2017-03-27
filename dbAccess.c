@@ -838,7 +838,7 @@ SQL_result* getUserStreams_DB(MYSQL * mysql, char* userID)
 	}
 
 	/* generate the query */
-	query = strduplicate("SELECT * FROM users WHERE user_id = \"");
+	query = strduplicate("SELECT id, user_id, stream_name, num_read FROM users WHERE user_id = \"");
 	query = join(query, userID);
 	query = join(query, "\"");
 
@@ -887,7 +887,7 @@ SQL_result* getStreamPosts_DB(MYSQL * mysql, char* stream)
 	}
 
 	/* generate the query */
-	query = strduplicate("SELECT * FROM posts WHERE stream_name = \"");
+	query = strduplicate("SELECT id, stream_name, user_id, date, text FROM posts WHERE stream_name = \"");
 	query = join(query, stream);
 	query = join(query, "\"");
 
