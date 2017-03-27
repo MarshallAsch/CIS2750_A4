@@ -40,7 +40,7 @@ def main():
 
 
 	# get the stream to view
-	status = markOne(userID, stream)
+	status = dbwrapper.markOne(userID, stream)
 
 	if (status != 0):
 		print("{\"data\": {\"status\": \"false\", \"userID\": \""+userID+"\", \"stream\": \""+stream+"\", \"msg\": \"permission in that stream denied\"} }")

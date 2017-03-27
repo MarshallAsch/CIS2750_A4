@@ -40,7 +40,7 @@ def main():
 
 	#check if they are marking all as ready
 	if (stream == "all"):
-		allStreams = getUsersStreams(userID)
+		allStreams = dbwrapper.getUsersStreams(userID)
 
 		# if they dont have permission end
 		if (allStreams == []):
@@ -50,14 +50,14 @@ def main():
 
 		# mark each stream as read
 		for stream in allStreams:
-			markAll(userID, stream)
+			dbwrapper.markAll(userID, stream)
 
 		print("{\"data\": {\"status\": \"true\", \"userID\": \""+userID+"\", \"stream\": \""+stream+"\"} }")
 
 		exit(0)
 
 	# mark a single stream as read
-	markAll(userID, stream)
+	dbwrapper.markAll(userID, stream)
 	print("{\"data\": {\"status\": \"true\", \"userID\": \""+userID+"\", \"stream\": \""+stream+"\"} }")
 	exit(0)
 

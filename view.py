@@ -125,15 +125,14 @@ def main():
 
 	# get the name of the user into  1 string
 	userID = argv[1]
-	streams = argv[2]
+	stream = argv[2]
 
 	postList = []
 	posts = []
 
-
 	#check if they are marking all as ready
 	if (stream == "all"):
-		allStreams = getUsersStreams(userID)
+		allStreams = dbwrapper.getUsersStreams(userID)
 
 		# if they dont have permission end
 		if (allStreams == []):
@@ -143,12 +142,12 @@ def main():
 
 		# mark each stream as read
 		for stream in allStreams:
-			tempPosts = getStreamPosts(userID, stream)
+			tempPosts = dbwrapper.getStreamPosts(userID, stream)
 			postList.append(tempPosts);
 
 	else:
 		#get the posts from teh one stream
-		tempPosts = getStreamPosts(userID, stream)
+		tempPosts = dbwrapper.getStreamPosts(userID, stream)
 		postList.append(tempPosts)
 
 
@@ -159,7 +158,7 @@ def main():
 		tempPostList = tempObj1[2]
 
 		for post in tempPostList:
-			post = new Post(post[2], post[3], post[1], post[4], post[5])
+			post = Post(post[2], post[3], post[1], post[4], post[5])
 			posts.append(post)
 
 
