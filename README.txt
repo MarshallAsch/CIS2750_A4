@@ -103,8 +103,6 @@ files can not be modified at the same time that they are being read
 
 the files must be in the correct format.
 
-the maximum length of a users name is the size of BUFFLEN [60] characters
-
 
 stream files must be in the format
 
