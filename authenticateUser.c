@@ -1,7 +1,7 @@
 /****************************** authenticateUser.c ***********************************
 Student Name: Marshall Aaron Asch            Student Number:  0928357
 Date: March 14, 2017                    	 Course Name: CIS*2750
-Assignment: A3
+Assignment: A4
 
 Checks the given userID to see if it is valid
 Can also check if the userID has permission in the given stream
@@ -12,6 +12,9 @@ escaped
 
 this program will write to a file called error.log with the authentication
 attempts and the result.
+
+modified for A4
+	-no longer spawns another thread to call python to load the streams
 
 ****************************************************************************/
 
@@ -26,15 +29,11 @@ attempts and the result.
 
 /**
  * loadStreams
- * Creates a child process to run the Python script
- * that will load the list of streams that the user
- * has permission in.
+ * Prints all the stream names teh user has permission in
  * will out put 1 on each line on success
  *
  * IN:	userID, the user ID it is checking
- * OUT: none
  * POST: prints the streams the user has permission in
- * ERROR: none
  */
 void loadStreams(char* userID);
 
@@ -64,7 +63,6 @@ int main(int argc, char const *argv[])
 		printf("Incorrect usage. ./auth \"userID\" \"stream name\"\n");
 		return -1;
 	}
-
 
 	/* connect to the database */
 	mysql = initSQL();
@@ -106,10 +104,10 @@ int main(int argc, char const *argv[])
 	}
 	else
 	{
+		fprintf(stderr, "userID and streamName not given.\n");
 		status = -1;
 	}
 
-	fprintf(stderr, "userID and streamName not given.\n");
 	free(userID);
 	free(streamName);
 	fclose(errorStream);
@@ -119,13 +117,11 @@ int main(int argc, char const *argv[])
 
 /**
  * loadStreams
- * Prints all teh stream names teh user has permission in
+ * Prints all the stream names teh user has permission in
  * will out put 1 on each line on success
  *
  * IN:	userID, the user ID it is checking
- * OUT: none
  * POST: prints the streams the user has permission in
- * ERROR: none
  */
 void loadStreams(char* userID)
 {
@@ -134,8 +130,17 @@ void loadStreams(char* userID)
 	int i;
 
 	mysql = initSQL();
+	if (mysql == NULL)
+	{
+		return;
+	}
 
 	result = getUserStreams_DB(mysql, userID);
+	if (result == NULL)
+	{
+		mysql_close(mysql);
+		return;
+	}
 
 	/* print all the users streams */
 	for (i = 0; i < result->numRows; i++)

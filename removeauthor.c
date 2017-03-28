@@ -7,6 +7,7 @@ Mofified from A2 addauthor
 
 This program will remove the given userID from the given list of streams
 
+
 ****************************************************************************/
 
 #include "stream.h"
@@ -22,14 +23,16 @@ This program will remove the given userID from the given list of streams
  *
  *
  */
-int main(int argc, char const *argv[]) {
+int main(int argc, char const *argv[])
+{
 	char* userID;
 	char* list;
 	FILE* errorStream;
 
 	errorStream  = freopen("error.log", "a", stderr);
 	/* make sure that the arguments given are valid */
-	if (argc != 3) {
+	if (argc != 3)
+	{
 		printf("Invalid usage: ./removeauthor \"userID\" \"stream list\"\n");
 		fclose(errorStream);
 		return -1;

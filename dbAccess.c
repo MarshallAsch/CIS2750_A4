@@ -1,9 +1,21 @@
+/****************************** dbAccess.c ***********************************
+Student Name: Marshall Aaron Asch			Student Number:  0928357
+Date: March 28 2017							Course Name: CIS*2750
+Assignment: A4
+
+Contains all the functions for accessing and manipulating the database
+
+****************************************************************************/
 
 #include "dbAccess.h"
 
-
-
-
+/**
+ * initSQL
+ * Initilize the mysql object and connect to the database
+ *
+ * @return pointer to the object on success
+ *         NULL on failure
+ */
 MYSQL* initSQL()
 {
 	MYSQL* mysql;
@@ -24,7 +36,24 @@ MYSQL* initSQL()
 	return mysql;
 }
 
-
+/**
+ * createTable_DB
+ * Create a new table with the given name if one does not exist.
+ * has a default column
+ * 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+ *
+ * 	adds the list of names and types for the columns/
+ *
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the table to create
+ * @param  numCol    the number of additional columns to add
+ * @param  name      the list of additional column names
+ * @param  type      the list of column types
+ * @return           -1 if param are invalid
+ *                   -2 if query failed
+ *                    0 on success
+ */
 int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char** type)
 {
 	int i;				/* loop var */
@@ -67,6 +96,20 @@ int createTable_DB(MYSQL* mysql, char* tableName, int numCol, char** name, char*
 	return 0;
 }
 
+/**
+ * insert_DB
+ * Insert a new row into the table with the given values
+ * for each of the columns.
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the table to insert into
+ * @param  numData   the number of elements
+ * @param  field     the names of the columns the data goes into
+ * @param  value     the values
+ * @return           -1 if param are not valid
+ *                   -2 if the query fails
+ *                    0 on success
+ */
 int insert_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
 {
 	int i;				/* loop var */
@@ -104,7 +147,6 @@ int insert_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** v
 	query = join(query, value[numData - 1]);
 	query = join(query, "\")");
 
-
 	/* mysql_query returns 0 on success */
 	if (mysql_query(mysql, query) != 0)
 	{
@@ -117,6 +159,20 @@ int insert_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** v
 	return 0;
 }
 
+/**
+ * update_DB
+ * Updates a new row into the table with the given values
+ * for each of the columns.
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the table to insert into
+ * @param  numData   the number of elements
+ * @param  field     the names of the columns the data goes into
+ * @param  value     the values
+ * @return           -1 if param are not valid
+ *                   -2 if the query fails
+ *                    0 on success
+ */
 int update_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** value)
 {
 	int i;				/* loop var */
@@ -127,7 +183,6 @@ int update_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** v
 	{
 		return -1;
 	}
-
 	/* create the query */
 	query = strduplicate("UPDATE ");
 	query = join(query, tableName);
@@ -157,6 +212,19 @@ int update_DB(MYSQL* mysql, char* tableName, int numData, char** field, char** v
 	return 0;
 }
 
+/**
+ * deleteFromTable_DB
+ * Deletes rows from the given table.
+ * If condition is NULL then all rows will be deleted.
+ * else only the rows that satisfy the condition will be removed
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the table to insert into
+ * @param  condition optional condtion to be met to delete only some rows
+ * @return           -1 if param are invalid
+ *                   -2 if it fails
+ *                    0 on success
+ */
 int deleteFromTable_DB(MYSQL* mysql, char* tableName, char* condition)
 {
 	char* query;
@@ -176,7 +244,6 @@ int deleteFromTable_DB(MYSQL* mysql, char* tableName, char* condition)
 		query = join(query, condition);
 	}
 
-
 	/* mysql_query returns 0 on success */
 	if (mysql_query(mysql, query) != 0)
 	{
@@ -189,6 +256,16 @@ int deleteFromTable_DB(MYSQL* mysql, char* tableName, char* condition)
 	return 0;
 }
 
+/**
+ * dropTable_DB
+ * Removed the entire table from the database
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the table to drop
+ * @return           -1 if param are invalid
+ *                   -2 if it fails
+ *                    0 on success
+ */
 int dropTable_DB(MYSQL* mysql, char* tableName)
 {
 	char* query;
@@ -202,7 +279,6 @@ int dropTable_DB(MYSQL* mysql, char* tableName)
 	query = strduplicate("DROP TABLE ");
 	query = join(query, tableName);
 
-
 	/* mysql_query returns 0 on success */
 	if (mysql_query(mysql, query) != 0)
 	{
@@ -215,11 +291,21 @@ int dropTable_DB(MYSQL* mysql, char* tableName)
 	return 0;
 }
 
-
+/**
+ * newStream_DB
+ * Add a new stream to the stream table
+ *
+ * @param  mysql     the mysql object
+ * @param  streamName the name of the stream to add
+ * @return           -1 if param are invalid
+ *                   -2 if it fails
+ *                    0 on success
+ */
 int newStream_DB(MYSQL* mysql, char* streamName)
 {
 	char* condition;
 	int num;
+
 	/* make sure that param are valid */
 	if (mysql == NULL || streamName == NULL)
 	{
@@ -255,14 +341,14 @@ int newStream_DB(MYSQL* mysql, char* streamName)
 	}
 }
 
-
-
 /**
- * [addUser description]
+ * addUser_DB
+ * Adds a user to the given stream if they are not already in the stream
+ * If the stream does not exist then it is created
  *
- * @param  mysql      [description]
- * @param  streamName [description]
- * @param  userID     [description]
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stream to add
+ * @param  userID     the name of the user to add
  * @return 0 		  On success added
  *         >0		  If the user is already in the stream
  *         <0		  On error
@@ -293,7 +379,6 @@ int addUser_DB(MYSQL* mysql, char* streamName, char* userID)
 	char* namesStreams[] = {"user_id", "stream_name", "num_read"};
 	char* data[] = {userID, streamName, "0"};
 
-
 	if (num > 0)
 	{
 		/* if the user is alreay in the stream */
@@ -311,6 +396,18 @@ int addUser_DB(MYSQL* mysql, char* streamName, char* userID)
 	}
 }
 
+/**
+ * removeUser_DB
+ * Removes a user from the given stream if they are
+ * in the stream
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stream to remove from
+ * @param  userID     the name of the user to remove
+ * @return 0 		  On success remove
+ *         -1 		  if param are invalid
+ *         			if delete failed
+ */
 int removeUser_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* condition;
@@ -335,7 +432,20 @@ int removeUser_DB(MYSQL * mysql, char* streamName, char* userID)
 	return status;
 }
 
-
+/**
+ * count_DB
+ * Counts the number of rows in the table that match the
+ * given condition.
+ *
+ * @param  mysql     the mysql object
+ * @param  tableName the name of the stream to remove from
+ * @param  condition optional condtion to be met
+ * @return           -1 if param are invalid
+ *                   -2 if query fails
+ *                   -3 if failed to load data
+ *                   -4 if there are too many rows
+ *                   >=0 on success
+ */
 int count_DB(MYSQL * mysql, char* tableName, char* condition)
 {
 	char* query;
@@ -366,7 +476,6 @@ int count_DB(MYSQL * mysql, char* tableName, char* condition)
 	}
 	free(query);
 
-
 	/* store the results of the query */
 	if (!(results = mysql_store_result(mysql)))
 	{
@@ -386,13 +495,20 @@ int count_DB(MYSQL * mysql, char* tableName, char* condition)
 	num = atoi(row[0]);
 
 	mysql_free_result(results);
-
-
 	return num;
 }
 
-
-
+/**
+ * markAllRead_DB
+ * Mark all the posts in the given stream as read by the user.
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stream that is read
+ * @param  userID     the ID of the user that has read them
+ * @return            -1 if param are invalid
+ *                    -2 if the query failed
+ *                    0 on success
+ */
 int markAllRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
@@ -434,6 +550,17 @@ int markAllRead_DB(MYSQL * mysql, char* streamName, char* userID)
 	return 0;
 }
 
+/**
+ * markOneRead_DB
+ * Mark one of the posts in the given stream as read by the user.
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stream that is read
+ * @param  userID     the ID of the user that has read them
+ * @return            -1 if param are invalid
+ *                    -2 if the query failed
+ *                    0 on success
+ */
 int markOneRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
@@ -474,6 +601,18 @@ int markOneRead_DB(MYSQL * mysql, char* streamName, char* userID)
 	return 0;
 }
 
+/**
+ * getNumPosts_DB
+ * Get the total number of posts that are in the stream.
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stram to get the number of posts for
+ * @return            -1 if param are invalid
+ *                    -2 if query failed
+ *                    -3 if failed to load data
+ *                    -4 if there are too many reasults
+ *                    >=0 on success
+ */
 int getNumPosts_DB(MYSQL * mysql, char* streamName)
 {
 	char* query;
@@ -500,7 +639,6 @@ int getNumPosts_DB(MYSQL * mysql, char* streamName)
 	}
 	free(query);
 
-
 	/* store the results of the query */
 	if (!(results = mysql_store_result(mysql)))
 	{
@@ -520,12 +658,22 @@ int getNumPosts_DB(MYSQL * mysql, char* streamName)
 	num = atoi(row[0]);
 
 	mysql_free_result(results);
-
-
 	return num;
 }
 
-
+/**
+ * getNumRead_DB
+ * Get the number of posts that has been read by the user
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the stream that the use has read
+ * @param  userID     the user that it is checking
+ * @return            -1 if param are invalid
+ *                    -2 if query failed
+ *                    -3 if failed to load data
+ *                    -4 if there are too many reasults
+ *                    >=0 on success
+ */
 int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 {
 	char* query;
@@ -554,7 +702,6 @@ int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 	}
 	free(query);
 
-
 	/* store the results of the query */
 	if (!(results = mysql_store_result(mysql)))
 	{
@@ -574,13 +721,22 @@ int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 	num = atoi(row[0]);
 
 	mysql_free_result(results);
-
-
 	return num;
 }
 
-
-
+/**
+ * submitPost_DB
+ * Submit the post to the database
+ *
+ * @param  mysql      the mysql object
+ * @param  streamName the name of the stream that the post is in
+ * @param  userID     the user ID that is summiting the post
+ * @param  text       the text of the post
+ * @param  date       the date the post was submitted
+ * @return            -1 if param are invaild
+ *                    -2 if query fails
+ *                     0 on success
+ */
 int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char* date)
 {
 	char* condition;
@@ -604,7 +760,6 @@ int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char
 	char* fieldName[] = {"user_id", "stream_name", "date", "text"};
 	char* data[] = {userID, streamName, date, text};
 
-
 	if (num == 1)
 	{
 		/* if the user is alreay in the stream */
@@ -622,15 +777,21 @@ int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char
 	}
 }
 
-
-
 /**
- * Prints the error message
+ * error
+ * Prints an error message to the stderr
  *
+ * @param msg   the given message to print
+ * @param mysql the mysql object that caused the error
  */
 void error(char* msg, MYSQL * mysql)
 {
+	FILE* errorStream;
+	errorStream  = freopen("error.log", "a", stderr);
+
 	fprintf(stderr, "%s\n%s\n", msg, mysql_error(mysql));
+
+	fclose(errorStream);
 }
 
 
@@ -641,6 +802,18 @@ void error(char* msg, MYSQL * mysql)
 ********************/
 
 
+/**
+ * newUserResult
+ * Creates a new result struct for a row from the
+ * users table.
+ *
+ * @param  id      the row ID (primary key)
+ * @param  userID  the users name
+ * @param  stream  the stream name
+ * @param  numRead the number of posts they have read
+ * @return         pointer to the struct on success
+ *                 NULL on failure
+ */
 SQL_users_result* newUserResult(char* id, char* userID, char* stream, char* numRead)
 {
 	SQL_users_result* result;
@@ -667,6 +840,17 @@ SQL_users_result* newUserResult(char* id, char* userID, char* stream, char* numR
 	return result;
 }
 
+/**
+ * newStreamResult
+ * Creates a new result struct for a row from the
+ * streams table.
+ *
+ * @param  id      the row ID (primary key)
+ * @param  stream  the stream name
+ * @param  numPosts the number of posts in the stream
+ * @return         pointer to the struct on success
+ *                 NULL on failure
+ */
 SQL_streams_result* newStreamResult(char* id, char* stream, char* numPosts)
 {
 	SQL_streams_result* result;
@@ -692,6 +876,19 @@ SQL_streams_result* newStreamResult(char* id, char* stream, char* numPosts)
 	return result;
 }
 
+/**
+ * newPostResult
+ * Creates a new result struct for a row from the
+ * posts table.
+ *
+ * @param  id      the row ID (primary key)
+ * @param  userID  the users name
+ * @param  stream  the stream name
+ * @param  date    the date that the post was created
+ * @param  text    the text of the post
+ * @return         pointer to the struct on success
+ *                 NULL on failure
+ */
 SQL_post_result* newPostResult(char* id, char* userID, char* stream, char* date, char* text)
 {
 	SQL_post_result* result;
@@ -720,7 +917,14 @@ SQL_post_result* newPostResult(char* id, char* userID, char* stream, char* date,
 }
 
 /**
- * The data needs to be filled and freed by caller
+ * newResult
+ * Creates a new result struct that holds the list
+ * of results. The list needs to be freed by the caller
+ *
+ * @param  numRows 		the number of rows in the list
+ * @param  numFields    the number of columns in the results
+ * @return         		pointer to the struct on success
+ *                      NULL on failure
  */
 SQL_result* newResult(int numRows, int numFields)
 {
@@ -765,6 +969,12 @@ SQL_result* newResult(int numRows, int numFields)
 
 ********************/
 
+/**
+ * freeUserResults
+ * Destroys all the memory that is used by the user results
+ *
+ * @param result the struct to be freed
+ */
 void freeUserResults(SQL_users_result * result)
 {
 	/* make sure the parameter is valid */
@@ -778,6 +988,13 @@ void freeUserResults(SQL_users_result * result)
 	free(result);
 }
 
+/**
+ * freeStreamResults
+ * Destroys all the memory that is used by the
+ * streams results
+ *
+ * @param result the struct to be freed
+ */
 void freeStreamResults(SQL_streams_result * result)
 {
 	/* make sure the parameter is valid */
@@ -790,6 +1007,13 @@ void freeStreamResults(SQL_streams_result * result)
 	free(result);
 }
 
+/**
+ * freePostResults
+ * Destroys all the memory that is used by the
+ * posts results
+ *
+ * @param result the struct to be freed
+ */
 void freePostResults(SQL_post_result * result)
 {
 	/* make sure the parameter is valid */
@@ -805,7 +1029,13 @@ void freePostResults(SQL_post_result * result)
 	free(result);
 }
 
-
+/**
+ * addData
+ * Adds a data row to the list of results
+ *
+ * @param result the list to add it to
+ * @param next   the new result to add
+ */
 void addData(SQL_result * result, void* next)
 {
 	/* make sure the parameters are valid */
@@ -817,10 +1047,15 @@ void addData(SQL_result * result, void* next)
 	result->data[result->current++] = next;
 }
 
-
-
-
-
+/**
+ * getUserStreams_DB
+ * Gets all the streams that a user has permission in
+ *
+ * @param  mysql  the mysql object
+ * @param  userID the user that it is searching for
+ * @return        pointer to the result struct on success
+ *                NULL on error
+ */
 SQL_result* getUserStreams_DB(MYSQL * mysql, char* userID)
 {
 	char* query;
@@ -870,7 +1105,15 @@ SQL_result* getUserStreams_DB(MYSQL * mysql, char* userID)
 	return result;
 }
 
-
+/**
+ * getStreamPosts_DB
+ * Gets all the posts that are in the stream
+ *
+ * @param  mysql  the mysql object
+ * @param  stream the stream that it is searching for
+ * @return        pointer to the result struct on success
+ *                NULL on error
+ */
 SQL_result* getStreamPosts_DB(MYSQL * mysql, char* stream)
 {
 	char* query;
@@ -917,9 +1160,3 @@ SQL_result* getStreamPosts_DB(MYSQL * mysql, char* stream)
 	mysql_free_result(res);
 	return result;
 }
-
-
-
-
-
-

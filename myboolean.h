@@ -20,7 +20,7 @@ A very basic boolean type
 #define FALSE 0
 #endif
 
-#define TOGGLE(a) a=(a+1) %2
+#define TOGGLE(a) a = (a + 1) % 2
 
 typedef int bool;
 

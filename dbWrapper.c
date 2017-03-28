@@ -1,37 +1,123 @@
+/****************************** dbWrapper.c ***********************************
+Student Name: Marshall Aaron Asch			Student Number:  0928357
+Date: March 28, 2017						Course Name: CIS*2750
+Assignment: A4
+
+Contains all the wrappers so that the python code can call the C functions
+for accessing the database
+
+
+****************************************************************************/
+
 
 #include <Python.h>
 #include "dbAccess.h"
 
 
 /* to be called by python */
+
+/**
+ * db_getUserStreams
+ * Wrapper for loading the users streams.
+ * Takes 1 python paramater of the userID
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, userID, streamName, numRead}, ...]}
+ */
 static PyObject* db_getUserStreams(PyObject *self, PyObject *args);
 
+/**
+ * db_getStreamPosts
+ * Wrapper for loading the stream posts.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, streamName, userID, date, text, viewed}, ...]}
+ */
 static PyObject* db_getStreamPosts(PyObject *self, PyObject *args);
 
+/**
+ * db_addAuthor
+ * Wrapper for adding an author to a stream.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_addAuthor(PyObject *self, PyObject *args);
 
+/**
+ * db_removeAuthor
+ * Wrapper for removeing an author from a stream.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_removeAuthor(PyObject *self, PyObject *args);
 
-static PyObject* db_newStream(PyObject *self, PyObject *args);
-
+/**
+ * db_markAll
+ * Wrapper for marking all posts as read
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_markAll(PyObject *self, PyObject *args);
 
+/**
+ * db_markOne
+ * Wrapper for marking one post as read
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_markOne(PyObject *self, PyObject *args);
 
+/**
+ * db_newStream
+ * Wrapper for adding a new stream
+ * Takes 1 python paramater of the streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
+static PyObject* db_newStream(PyObject *self, PyObject *args);
 
-
-
-
-/* internal */
+/**
+ * genResult_streams
+ * Converts the C result struct into a python object
+ * This will free the result struct
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, userID, streamName, numRead}, ...]}
+ */
 static PyObject* genResult_streams(SQL_result* result);
 
+/**
+ * genResult_streams
+ * Converts the C result struct into a python object
+ * This will free the result struct
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, streamName, userID, date, text, viewed}, ...]}
+ */
 static PyObject* genResult_posts(SQL_result* result, int numRead);
 
-
-
-
-
-
+/**
+ * The list of function mappings from python to the corosponding
+ * C functions
+ */
 static PyMethodDef dbwrapper_funcs[] =
 {
 	{ "getStreamPosts", (PyCFunction)db_getStreamPosts, METH_VARARGS, NULL },
@@ -44,8 +130,9 @@ static PyMethodDef dbwrapper_funcs[] =
 	{ NULL, NULL, 0, NULL }
 };
 
-
-
+/**
+ * The modual deffinition
+ */
 static struct PyModuleDef db_module =
 {
 	PyModuleDef_HEAD_INIT,
@@ -55,31 +142,41 @@ static struct PyModuleDef db_module =
 	dbwrapper_funcs
 };
 
-
-
+/**
+ * PyInit_dbwrapper
+ * Required function so that the python interpreter can
+ * initilize the module.
+ *
+ */
 PyMODINIT_FUNC PyInit_dbwrapper(void)
 {
 	Py_Initialize();
 	return PyModule_Create(&db_module);
 }
 
-
-
+/**
+ * db_getUserStreams
+ * Wrapper for loading the users streams.
+ * Takes 1 python paramater of the userID
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, userID, streamName, numRead}, ...]}
+ */
 static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
 	SQL_result* result;
-
 	char* userID;
 
+	/* set default value */
 	userID = NULL;
 
+	/* get the parameters*/
 	if (PyArg_ParseTuple(args, "s", &userID) == 0)
 	{
 		return NULL;
 	}
-
-
 	mysql = initSQL();
 
 	/* get the data */
@@ -90,6 +187,15 @@ static PyObject* db_getUserStreams(PyObject *self, PyObject *args)
 	return genResult_streams(result);
 }
 
+/**
+ * db_getStreamPosts
+ * Wrapper for loading the stream posts.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, streamName, userID, date, text, viewed}, ...]}
+ */
 static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
@@ -98,9 +204,11 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 	char* userID;
 	int numRead;
 
+	/* set default values */
 	userID = NULL;
 	stream = NULL;
 
+	/* get the parameters */
 	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
@@ -115,12 +223,18 @@ static PyObject* db_getStreamPosts(PyObject *self, PyObject *args)
 
 	mysql_close(mysql);
 
-
 	return genResult_posts(result, numRead);
 }
 
-
-
+/**
+ * db_addAuthor
+ * Wrapper for adding an author to a stream.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
@@ -128,10 +242,11 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	char* userID;
 	int status;
 
-
+	/* set default values */
 	stream = NULL;
 	userID = NULL;
 
+	/* load the paramaeters */
 	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
@@ -154,7 +269,15 @@ static PyObject* db_addAuthor(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
-
+/**
+ * db_removeAuthor
+ * Wrapper for removeing an author from a stream.
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
@@ -162,10 +285,11 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 	char* userID;
 	int status;
 
-
+	/* set default values */
 	stream = NULL;
 	userID = NULL;
 
+	/* load the parameters */
 	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
@@ -181,6 +305,15 @@ static PyObject* db_removeAuthor(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
+/**
+ * db_markAll
+ * Wrapper for marking all posts as read
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_markAll(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
@@ -188,10 +321,11 @@ static PyObject* db_markAll(PyObject *self, PyObject *args)
 	char* userID;
 	int status;
 
-
+	/* set default values */
 	stream = NULL;
 	userID = NULL;
 
+	/* get the parameters */
 	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
@@ -207,6 +341,15 @@ static PyObject* db_markAll(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
+/**
+ * db_markOne
+ * Wrapper for marking one post as read
+ * Takes 2 python paramater of the userID, streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_markOne(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
@@ -214,10 +357,11 @@ static PyObject* db_markOne(PyObject *self, PyObject *args)
 	char* userID;
 	int status;
 
-
+	/* set the default values */
 	stream = NULL;
 	userID = NULL;
 
+	/* get the parameters */
 	if (PyArg_ParseTuple(args, "ss", &userID, &stream) == 0)
 	{
 		return NULL;
@@ -233,12 +377,20 @@ static PyObject* db_markOne(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
+/**
+ * db_newStream
+ * Wrapper for adding a new stream
+ * Takes 1 python paramater of the streamName
+ *
+ * returns a python object in the form of
+ *
+ * status
+ */
 static PyObject* db_newStream(PyObject *self, PyObject *args)
 {
 	MYSQL* mysql;
 	char* stream;
 	int status;
-
 
 	stream = NULL;
 
@@ -257,11 +409,21 @@ static PyObject* db_newStream(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", status);
 }
 
+/**************************************
 
+ convert the struct into a python
+ object and return that
 
-/* convert the struct into a py object and return that */
+ **************************************/
 
-/* destroys the result struct */
+/**
+ * genResult_streams
+ * Converts the C result struct into a python object
+ * This will free the result struct
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, userID, streamName, numRead}, ...]}
+ */
 static PyObject* genResult_streams(SQL_result* result)
 {
 	int i;
@@ -295,14 +457,21 @@ static PyObject* genResult_streams(SQL_result* result)
 	return obj;
 }
 
-/* destroys the result struct */
+/**
+ * genResult_streams
+ * Converts the C result struct into a python object
+ * This will free the result struct
+ *
+ * returns a python object in the form of
+ *
+ * {numRow, numField, [{id, streamName, userID, date, text, viewed}, ...]}
+ */
 static PyObject* genResult_posts(SQL_result* result, int numRead)
 {
 	int i;
 	SQL_post_result* post;
 	PyObject* obj;
 	PyObject* list;
-
 
 	if (result == NULL)
 	{

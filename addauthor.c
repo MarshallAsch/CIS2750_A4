@@ -22,14 +22,17 @@ This program will add the given userID from the given list of streams
  * Takes in arguments and an optional
  *
  */
-int main(int argc, char const *argv[]) {
+int main(int argc, char const *argv[])
+{
 	char* userID;
 	char* list;
 	FILE* errorStream;
 
 	errorStream  = freopen("error.log", "a", stderr);
+
 	/* make sure that the arguments given are valid */
-	if (argc != 3) {
+	if (argc != 3)
+	{
 		printf("Invalid usage: ./addauthor \"userID\" \"stream list\"\n");
 		fclose(errorStream);
 		return -1;

@@ -1,15 +1,14 @@
 /****************************** stream.c ***********************************
 Student Name: Marshall Aaron Asch            Student Number:  0928357
-Date: March 14, 2017                    	 Course Name: CIS*2750
-Assignment: A3
+Date: March 28, 2017                    	 Course Name: CIS*2750
+Assignment: A4
 
 Contains all the functions for writing to creating and modifying the streams
 
 
 changeLog:
-
- - for A3 any output was moved from standard out to stderr
-
+	- for A3 any output was moved from standard out to stderr
+	- for A4 changed to use the database instead of the files
 ****************************************************************************/
 
 #include "dbAccess.h"
@@ -41,9 +40,10 @@ void destroyPost(struct userPost * post)
 
 /**
  * updateStream
- * Saves the post to the file. If the stream does not exist
- * then it is created and the post is saved even if the user
- * does not have permission.
+ * Saves the post to the table. If the stream does not exist
+ * then it is not created.
+ * The user must have permisoin in the stream.
+ *
  * IN: 	st, the struct containing the data to be posted
  * OUT: none
  * POST: files are created if nesisay, the files are modified
@@ -67,7 +67,6 @@ void updateStream(struct userPost *st)
 
 	/* write post to the DB */
 	submitPost_DB(mysql, st->streamname, st->username, st->text, st->date);
-
 
 	mysql_close(mysql);
 }

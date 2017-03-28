@@ -1,9 +1,13 @@
 /****************************** db.c ***********************************
-Student Name: Marshall Aaron Asch		             Student Number:  0928357
-Date: March 22, 2017                  	Course Name: CIS*2750
+Student Name: Marshall Aaron Asch			Student Number:  0928357
+Date: March 22, 2017						Course Name: CIS*2750
 Assignment: A4
 
-	description
+The program for accesing the database.
+can create, destroy and view the tables.
+
+Takes in 1 commandline argument which is the acction it will do.
+
 ****************************************************************************/
 
 
@@ -11,23 +15,43 @@ Assignment: A4
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "mystring.h"
 #include "dbAccess.h"
+#include "db.h"
 
-
-
-/* prints all the data */
-int printUsers(MYSQL* mysql);
-int printStreams(MYSQL* mysql);
-int printposts(MYSQL* mysql);
-int clearAll(MYSQL* mysql);
-int deleteAll(MYSQL* mysql);
-int createAllTables(MYSQL* mysql);
-
-
+/**
+ * usage
+ * Prints the usage message for this program
+ */
 static void usage();
+
+/**
+ * parseOption
+ * Parses the commndline argument into its character flag
+ *
+ * @param  option	the commandline argument
+ * @return c		clear
+ *         r		reset
+ *         p		posts
+ *         u		users
+ *         s		streams
+ *         h		help
+ *         i		initilize
+ *         o		unknown option
+ */
 static char parseOption(const char* option);
 
+
+/**
+ * main
+ * Main entry point to the program
+ *
+ * @param  argc number of commandline arguments
+ * @param  argv arguments
+ * @return      -1 if there are not the correct number
+ *               0 on success
+ */
 int main(int argc, char const *argv[])
 {
 	MYSQL* mysql;
@@ -41,7 +65,6 @@ int main(int argc, char const *argv[])
 
 	/* initilize connection to the database */
 	mysql = initSQL();
-
 
 	switch (parseOption(argv[1]))
 	{
@@ -72,57 +95,23 @@ int main(int argc, char const *argv[])
 		break;
 	}
 
-
 	mysql_close(mysql);
 
 	return 0;
 }
 
-
-static char parseOption(const char* option)
-{
-	/* make sure an option is given */
-	if (option == NULL)
-	{
-		return 'o';
-	}
-
-	if (strcmp_nocase(option, "-clear") == 0)
-	{
-		return 'c';
-	}
-
-	if (strcmp_nocase(option, "-reset") == 0)
-	{
-		return 'r';
-	}
-	if (strcmp_nocase(option, "-posts") == 0)
-	{
-		return 'p';
-	}
-	if (strcmp_nocase(option, "-users") == 0)
-	{
-		return 'u';
-	}
-	if (strcmp_nocase(option, "-streams") == 0)
-	{
-		return 's';
-	}
-	if (strcmp_nocase(option, "-help") == 0)
-	{
-		return 'h';
-	}
-	if (strcmp_nocase(option, "-init") == 0)
-	{
-		return 'i';
-	}
-
-	return 'o';
-}
-
-
-
-
+/**
+ * printUsers
+ * Prints all of the user names in the databse
+ * If a user is in multiple streams then it is
+ * only printed once.
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *               -2  failed to load from DB
+ *               -3  failed to load the data
+ *               0   on success
+ */
 int printUsers(MYSQL* mysql)
 {
 	char* query;
@@ -145,7 +134,6 @@ int printUsers(MYSQL* mysql)
 		return -2;
 	}
 	free(query);
-
 
 	/* store the results of the query */
 	if (!(results = mysql_store_result(mysql)))
@@ -171,6 +159,16 @@ int printUsers(MYSQL* mysql)
 	return 0;
 }
 
+/**
+ * printStreams
+ * Prints all of the streams in the databse
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *               -2  failed to load from DB
+ *               -3  failed to load the data
+ *               0   on success
+ */
 int printStreams(MYSQL* mysql)
 {
 	char* query;
@@ -218,6 +216,22 @@ int printStreams(MYSQL* mysql)
 	return 0;
 }
 
+/**
+ * printposts
+ * Prints all of the posts in each stream. in the from:
+ *
+ * 		stream: ...
+ *		userID: ...
+ *		date: ...
+ *		text: ...
+ *		----------------------------------------
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *               -2  failed to load from DB
+ *               -3  failed to load the data
+ *                0  on success
+ */
 int printposts(MYSQL* mysql)
 {
 	char* query;
@@ -265,13 +279,19 @@ int printposts(MYSQL* mysql)
 	{
 		printf("table is empty.\n");
 	}
+
 	mysql_free_result(results);
-
-
 	return 0;
 }
 
-
+/**
+ * clearAll
+ * Deletes all of the data in the tables.
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *                0  on success
+ */
 int clearAll(MYSQL* mysql)
 {
 	/* make sure the parameters is valid */
@@ -288,7 +308,14 @@ int clearAll(MYSQL* mysql)
 	return 0;
 }
 
-
+/**
+ * deleteAll
+ * Deletes all of the tables.
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *                0  on success
+ */
 int deleteAll(MYSQL* mysql)
 {
 	/* make sure the parameters is valid */
@@ -305,7 +332,30 @@ int deleteAll(MYSQL* mysql)
 	return 0;
 }
 
-
+/**
+ * createAllTables
+ * Creates the 3 tables (if they do not exist)
+ * The tables are case sensitive
+ *
+ * users:
+ * 		ID		user_id		stream_name		num_read
+ *   	int		text		text			int
+ *	   	PK
+ *
+ * streams:
+ * 		ID		stream_name		num_posts
+ *   	int		text			int
+ *	   	PK
+ *
+ * posts:
+ * 		ID		stream_name		user_id		date		text
+ *   	int		text			text		datetime	text
+ *	   	PK
+ *
+ * @param  mysql MSQL refrence struct
+ * @return       -1  invalid param
+ *                0  on success
+ */
 int createAllTables(MYSQL* mysql)
 {
 	int status;
@@ -330,7 +380,6 @@ int createAllTables(MYSQL* mysql)
 	if (status != 0)
 	{
 		printf("Failed to create the users table.\n");
-		return -1;
 	}
 
 	/* try to create the posts table */
@@ -338,7 +387,6 @@ int createAllTables(MYSQL* mysql)
 	if (status != 0)
 	{
 		printf("Failed to create the posts table.\n");
-		return -1;
 	}
 
 	/* try to create the streams table */
@@ -346,14 +394,16 @@ int createAllTables(MYSQL* mysql)
 	if (status != 0)
 	{
 		printf("Failed to create the streams table.\n");
-		return -1;
 	}
 
-	printf("Success.\n");
+	printf("Done.\n");
 	return 0;
 }
 
-
+/**
+ * usage
+ * Prints the usage message for this program
+ */
 static void usage()
 {
 	printf("Usage: ./db\nuse to access the database\n");
@@ -364,5 +414,60 @@ static void usage()
 	printf("  -streams : prints out all stream names stored in the database\n");
 	printf("  -init : Creates the users, streams, and posts tables\n");
 	printf("  -help : displays this help message\n\n");
+}
+
+/**
+ * parseOption
+ * Parses the commndline argument into its character flag
+ *
+ * @param  option	the commandline argument
+ * @return c		clear
+ *         r		reset
+ *         p		posts
+ *         u		users
+ *         s		streams
+ *         h		help
+ *         i		initilize
+ *         o		unknown option
+ */
+static char parseOption(const char* option)
+{
+	/* make sure an option is given */
+	if (option == NULL)
+	{
+		return 'o';
+	}
+
+	if (strcmp_nocase(option, "-clear") == 0)
+	{
+		return 'c';
+	}
+
+	if (strcmp_nocase(option, "-reset") == 0)
+	{
+		return 'r';
+	}
+	if (strcmp_nocase(option, "-posts") == 0)
+	{
+		return 'p';
+	}
+	if (strcmp_nocase(option, "-users") == 0)
+	{
+		return 'u';
+	}
+	if (strcmp_nocase(option, "-streams") == 0)
+	{
+		return 's';
+	}
+	if (strcmp_nocase(option, "-help") == 0)
+	{
+		return 'h';
+	}
+	if (strcmp_nocase(option, "-init") == 0)
+	{
+		return 'i';
+	}
+
+	return 'o';
 }
 
