@@ -484,7 +484,7 @@ static PyObject* genResult_posts(SQL_result* result, int numRead)
 	for (i = 0; i < result->numRows; i++)
 	{
 		post = result->data[i];
-		if ( i <= numRead)
+		if ( i < numRead)
 		{
 			obj = Py_BuildValue("issssi", post->id, post->stream_name, post->user_id, post->date, post->text, 1);
 		}

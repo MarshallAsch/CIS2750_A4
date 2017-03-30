@@ -17,6 +17,7 @@
 # neccisary includes
 import sys
 import textwrap
+import dbwrapper
 
 
 # main entry point for the program
