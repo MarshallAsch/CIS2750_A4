@@ -8,7 +8,7 @@
     color: #bbbbbb;
 }
 
-.button:hover 
+.button:hover
 {
     color: #c803ff;
     background-color: #ffdd03;
@@ -29,6 +29,6 @@
 }
 
 .button-group {
-    
+
     width: 100%;
 }

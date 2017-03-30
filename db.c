@@ -56,6 +56,8 @@ int main(int argc, char const *argv[])
 {
 	MYSQL* mysql;
 
+
+
 	/* make sure the num arguments are correct */
 	if (argc != 2)
 	{

@@ -740,6 +740,7 @@ int getNumRead_DB(MYSQL * mysql, char* streamName, char* userID)
 int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char* date)
 {
 	char* condition;
+	char* query;
 	int num;
 	/* make sure that param are valid */
 	if (mysql == NULL || streamName == NULL || userID == NULL || text == NULL || date == NULL)
@@ -763,6 +764,21 @@ int submitPost_DB(MYSQL* mysql, char* streamName, char* userID, char* text, char
 	if (num == 1)
 	{
 		/* if the user is alreay in the stream */
+
+		/* change tbe total number of posts the user has read */
+		query = strduplicate("UPDATE streams SET num_posts = num_posts + 1 WHERE stream_name = \"");
+		query = join(query, streamName);
+		query = join(query, "\"");
+
+		if (mysql_query(mysql, query) != 0)
+		{
+			error("failed to perform the query", mysql);
+			free(query);
+			return -2;
+		}
+		free(query);
+
+
 		return insert_DB(mysql, "posts", 4, fieldName, data);
 	}
 	else if (num == 0)
