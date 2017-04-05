@@ -1,5 +1,3 @@
-#!/usr/local/bin/python3
-# change use on the server
 #!/usr/bin/python3
 
 ################################ markOne.py ################################

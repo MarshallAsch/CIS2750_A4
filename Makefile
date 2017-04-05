@@ -178,5 +178,5 @@ $(OUT_DIR)%.o: %.c | $(OUT_DIR)
 
 #to package the code to be submitted
 tar:
-	make destroy
-	tar cf a2.tar *.h *.c *.cc *.php *.wpml *.js *.css *.py Makefile README.txt divClose.txt divOpen.txt
+	make clean
+	tar cf a4.tar *.h *.c *.cc *.php *.wpml *.js *.css *.py Makefile README.txt divClose.txt divOpen.txt

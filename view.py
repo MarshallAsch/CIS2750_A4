@@ -1,5 +1,3 @@
-#!/usr/local/bin/python3
-# change use on the server
 #!/usr/bin/python3
 
 ################################ view.py ################################
@@ -135,20 +133,21 @@ def main():
 		allStreams = dbwrapper.getUsersStreams(userID)
 
 		# if they dont have permission end
-		if (allStreams == []):
+		if (allStreams[0] == 0):
 			print("{\"data\": {\"status\": \"false\", \"userID\": \""+userID+"\", \"stream\": \""+stream+"\", \"msg\": \"User has no permission in streams\"} }")
 
 			exit(1)
 
 		# mark each stream as read
-		for stream in allStreams:
-			tempPosts = dbwrapper.getStreamPosts(userID, stream)
+		for stream in allStreams[2]:
+			tempPosts = dbwrapper.getStreamPosts(userID, stream[2])
 			postList.append(tempPosts);
 
 	else:
 		#get the posts from teh one stream
 		tempPosts = dbwrapper.getStreamPosts(userID, stream)
 		postList.append(tempPosts)
+
 
 
 
