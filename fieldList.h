@@ -14,8 +14,11 @@ fields of teh forms.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+
 #include "mystring.h"
 #include "myboolean.h"
+
 
 
 typedef struct FieldList {

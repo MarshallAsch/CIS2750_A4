@@ -17,7 +17,7 @@ with strings
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "myboolean.h"
+#include <stdbool.h>
 
 
 typedef char* string;
@@ -26,8 +26,7 @@ typedef char* string;
  * A linked list structure for strings
  *
  */
-typedef struct StringList
-{
+typedef struct StringList {
 	char* str;
 	struct StringList * next;
 } StringList;

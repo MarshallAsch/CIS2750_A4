@@ -72,18 +72,18 @@ char* isType(Keyword* token) {
 	strcpy(type_list[16][1], "\0");		/* special */
 
 	type = NULL;
-	isVar = FALSE;
+	isVar = false;
 
 	/* check if the current token is a type keyword */
 	for (i = 0; i < topList; i++) {
 		if (strcmp(token->token, type_list[i][0]) == 0) {
-			isVar = TRUE;
+			isVar = true;
 			type = join(type, type_list[i][1]);
 			break;
 		}
 	}
 
-	if (isVar != TRUE) {
+	if (isVar != true) {
 		/* check if it is a struct*/
 		if (strcmp(token->token, "struct") == 0) {
 			type = joinC(type, 's');
@@ -96,7 +96,7 @@ char* isType(Keyword* token) {
 				concat(token);
 			}
 
-			if (isDupList(type_list, token->token, topList) == FALSE) {
+			if (isDupList(type_list, token->token, topList) == false) {
 				strcpy(type_list[topList][0], token->token);
 				strcpy(type_list[topList][1], type);
 				topList++;
@@ -111,11 +111,11 @@ char* isType(Keyword* token) {
 	}
 
 	/* join all the type strings into 1 */
-	while (token->next != NULL && isVar == TRUE) {
-		isVar = FALSE;
+	while (token->next != NULL && isVar == true) {
+		isVar = false;
 
 		if (strcmp(token->next->token, "*") == 0) {
-			isVar = TRUE;
+			isVar = true;
 			concat(token);
 			type = joinC(type, 'P');
 			continue;
@@ -123,7 +123,7 @@ char* isType(Keyword* token) {
 
 		for (i = 0; i < topList; i++) {
 			if (strcmp(token->next->token, type_list[i][0]) == 0) {
-				isVar = TRUE;
+				isVar = true;
 
 				type = join(type, type_list[i][1]);
 				concat(token);
@@ -145,7 +145,7 @@ char* isType(Keyword* token) {
 		return type;
 	}
 
-	if (isDupList(type_list, token->token, topList) == FALSE) {
+	if (isDupList(type_list, token->token, topList) == false) {
 		strcpy(type_list[topList][0], token->token);
 		strcpy(type_list[topList][1], type);
 		topList++;
@@ -160,24 +160,24 @@ char* isType(Keyword* token) {
  * IN: 	type_list, the list of the types
  *		type, the current string that is being checked
  *		top, the number of elements that are currently in the list
- * OUT: TRUE, if the string is in the list
- *		FALSE, if it is not in the list
+ * OUT: true, if the string is in the list
+ *		false, if it is not in the list
  * POST: none
- * ERROR: FALSE, on error
+ * ERROR: false, on error
  */
 bool isDupList(char type_list[200000][2][200], char* type, int top) {
 	int i;
 
 	/* check that the paremeters are valid*/
 	if (type_list == NULL || type == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	/* check the list*/
 	for (i = 0; i < top; i++) {
 		if (strcmp(type_list[i][0], type) == 0) {
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }

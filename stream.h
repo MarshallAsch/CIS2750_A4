@@ -17,16 +17,13 @@ Contains all the functions for writing to creating and modifying the streams
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <stdbool.h>
 
 #include "mystring.h"
 #include "input.h"
-#include "myboolean.h"
 
 
-
-struct userPost
-{
+struct userPost {
 	char *username;
 	char *streamname;
 	char *date;

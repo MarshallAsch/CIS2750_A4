@@ -504,10 +504,10 @@ void printTokensAll(FILE* output, Keyword* head) {
  * the seconds tokens whitespace is moved to the first.
  *
  * IN:	start, the first token that is being joined.
- * OUT: TRUE, on success
- *		FALSE, on failure
+ * OUT: true, on success
+ *		false, on failure
  * POST: the second token is freed and there strings are joined together
- * ERROR: FALSE, if ether token does not exist
+ * ERROR: false, if ether token does not exist
  */
 bool concat(Keyword* start) {
 	Keyword* next;
@@ -515,7 +515,7 @@ bool concat(Keyword* start) {
 
 	/* check that peram are valid */
 	if (start == NULL || start->next == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	next = start->next;
@@ -525,7 +525,7 @@ bool concat(Keyword* start) {
 
 	/* make sure malloc worked */
 	if (new == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	/* join the tokens */
@@ -552,7 +552,7 @@ bool concat(Keyword* start) {
 	free(next->token);
 	free(next);
 
-	return TRUE;
+	return true;
 }
 
 

@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
 	isValid = checkFiletype(argv[1]);
 
 	/* make sure that the file is the correct type */
-	if (isValid == FALSE) {
+	if (isValid == false) {
 		printf("<h1>Error. File is the wrong type.</h1>\n");
 		return 1;
 	}
@@ -54,10 +54,10 @@ int main(int argc, char const *argv[]) {
  * Takes in a filename and checks if its extension is .wpml
  *
  * IN:	file, the name of the file to check
- * OUT: TRUE, if the extension is .wpml
- *		FALSE, otherwise or on error
+ * OUT: true, if the extension is .wpml
+ *		false, otherwise or on error
  * POST: none
- * ERROR: FALSE if the filename does not exist or does not contain an extension
+ * ERROR: false if the filename does not exist or does not contain an extension
  */
 bool checkFiletype(const char* file) {
 	char* fileName;
@@ -69,7 +69,7 @@ bool checkFiletype(const char* file) {
 
 	/* make sure that the file is given */
 	if (fileName == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	startExtension = lastIndex(fileName, '.');
@@ -79,11 +79,11 @@ bool checkFiletype(const char* file) {
 	if (extension == NULL || strcmp(extension, "wpml") != 0) {
 		free(fileName);
 		free(extension);
-		return FALSE;
+		return false;
 	} else {
 		free(fileName);
 		free(extension);
-		return TRUE;
+		return true;
 	}
 }
 
@@ -201,8 +201,8 @@ void parseTag(FILE* file, char type) {
 
 
 
-	isStr = FALSE;
-	end_file = FALSE;
+	isStr = false;
+	end_file = false;
 
 	string = NULL;
 	keyStr = NULL;
@@ -228,7 +228,7 @@ void parseTag(FILE* file, char type) {
 
 	/* make sure it did not reach the end of the file */
 	if (temp == EOF) {
-		end_file = TRUE;
+		end_file = true;
 	} else {
 		ungetc(temp, file);
 
@@ -236,12 +236,12 @@ void parseTag(FILE* file, char type) {
 		while ((temp = fgetc(file))) {
 			/* check for premature EOF */
 			if (temp == EOF) {
-				end_file = TRUE;
+				end_file = true;
 				break;
 			}
 
 			/* check if it reached the end of the tag*/
-			if (temp == ')' && isStr == FALSE) {
+			if (temp == ')' && isStr == false) {
 				/* add this string to the list */
 				param = newParam(keyStr, string);
 				paramList = addToParamList(paramList, param);
@@ -254,7 +254,7 @@ void parseTag(FILE* file, char type) {
 			}
 
 			/* the end of a token  */
-			if ((temp == ',' || temp == '=' ) && isStr == FALSE) {
+			if ((temp == ',' || temp == '=' ) && isStr == false) {
 
 				/* set the old string to the key and the next to the value */
 				if (temp == '=') {
@@ -298,7 +298,7 @@ void parseTag(FILE* file, char type) {
 			}
 
 			/* skip any whitespcae that is not in a string */
-			if (temp == ' ' && isStr == FALSE) {
+			if (temp == ' ' && isStr == false) {
 				continue;
 			}
 
@@ -308,7 +308,7 @@ void parseTag(FILE* file, char type) {
 	}
 
 	/* check if the file ended unexcpectedly */
-	if (end_file == TRUE) {
+	if (end_file == true) {
 		printf("Error unexcpected end of file.\n");
 		return;
 	}
@@ -436,7 +436,7 @@ void parseTag(FILE* file, char type) {
 		text = NULL;
 		name = NULL;
 		defaultValue = NULL;
-		required = FALSE;
+		required = false;
 		newFieldElement = NULL;
 		fields = NULL;
 		other = NULL;
@@ -462,9 +462,9 @@ void parseTag(FILE* file, char type) {
 				} else if (strcmp(paramList->list[i]->key, "required") == 0) {
 					if (strcmp_nocase(paramList->list[i]->value, "true") == 0 ||
 					        strcmp_nocase(paramList->list[i]->value, "\"true\"") == 0) {
-						required = TRUE;
+						required = true;
 					} else {
-						required = FALSE;
+						required = false;
 					}
 				} else if (strcmp(paramList->list[i]->key, "text") == 0) {
 
@@ -481,7 +481,7 @@ void parseTag(FILE* file, char type) {
 
 						free(other);
 						other = NULL;
-						required = FALSE;
+						required = false;
 					}
 
 					text = paramList->list[i]->value;
@@ -603,7 +603,7 @@ void parseTag(FILE* file, char type) {
 				} else if (strcmp(paramList->list[i]->key, "value") == 0) {
 					defaultValue = paramList->list[i]->value;
 
-					newFieldElement = newField(NULL, NULL, defaultValue, FALSE, other);
+					newFieldElement = newField(NULL, NULL, defaultValue, false, other);
 					fields = addToList(fields, newFieldElement);
 
 					free(other);
@@ -963,7 +963,7 @@ void createFormText(char* actionIn, FieldList* fields) {
 	/* go through all the fields*/
 	tempField = fields;
 	while (tempField != NULL) {
-		if (tempField->required == TRUE) {
+		if (tempField->required == true) {
 			printf("<label for=%s>%s <span class=\"required\">*</span></label>", tempField->name, tempField->prompt);
 			printf("<input type=\"text\" name=%s id=%s value=%s required>\n", tempField->name, tempField->name, tempField->defaultValue);
 		} else {
@@ -1015,7 +1015,7 @@ void createFormRadio(char* actionIn, char* nameIn, char* promptIn, FieldList* fi
 	prompt = unWrapQuote(promptIn);
 
 
-	first = TRUE;
+	first = true;
 
 	if (nameIn == NULL) {
 		free(name);
@@ -1038,7 +1038,7 @@ void createFormRadio(char* actionIn, char* nameIn, char* promptIn, FieldList* fi
 	/* go through all the fields*/
 	tempField = fields;
 	while (tempField != NULL) {
-		if (first == TRUE) {
+		if (first == true) {
 			printf("<input type=\"radio\" name=%s id=%s value=%s checked>%s<br>\n", name, name, tempField->defaultValue, tempField->defaultValue);
 
 		} else {

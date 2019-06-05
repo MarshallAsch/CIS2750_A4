@@ -12,7 +12,7 @@ This program will add the given userID from the given list of streams
 
 #include "stream.h"
 #include "mystring.h"
-#include "myboolean.h"
+#include <stdbool.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,8 +22,7 @@ This program will add the given userID from the given list of streams
  * Takes in arguments and an optional
  *
  */
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 	char* userID;
 	char* list;
 	FILE* errorStream;
@@ -31,8 +30,7 @@ int main(int argc, char const *argv[])
 	errorStream  = freopen("error.log", "a", stderr);
 
 	/* make sure that the arguments given are valid */
-	if (argc != 3)
-	{
+	if (argc != 3) {
 		printf("Invalid usage: ./addauthor \"userID\" \"stream list\"\n");
 		fclose(errorStream);
 		return -1;

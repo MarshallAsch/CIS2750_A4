@@ -189,7 +189,7 @@ List* newElement(char* name, char* typeList) {
 	/* set the rest of the fields */
 	(element->newName)[0] = '\0';
 	element->next = NULL;
-	element->needsOBJ = FALSE;
+	element->needsOBJ = false;
 
 	return element;
 }
@@ -333,17 +333,17 @@ void printList(List* list) {
  * IN:	list, the head of the list to search
  *		oldName, the name of the element
  *		newName, the new name to add to the element
- * OUT: TRUE on success
- *		FALSE on failure
+ * OUT: true on success
+ *		false on failure
  * POST: adds the new name to the element
- * ERROR: FALSE if the parameters are not valid
+ * ERROR: false if the parameters are not valid
  */
 bool addNewName(List* list, char* oldName, char* newName) {
 	List* temp;
 
 	/* check the parameters are valid */
 	if (list == NULL || oldName == NULL || newName == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	/* search for the element with the matching old name */
@@ -354,13 +354,13 @@ bool addNewName(List* list, char* oldName, char* newName) {
 
 	/* make sure that it didnt run off the end of the list */
 	if (temp == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	free(temp->newName);
 	temp->newName = strduplicate(newName);
 
-	return TRUE;
+	return true;
 }
 
 /**
@@ -370,17 +370,17 @@ bool addNewName(List* list, char* oldName, char* newName) {
  *
  * IN:	list, the head of the list to search
  *		name, the name of the element
- * OUT: TRUE on success
- *		FALSE on failure
- * POST: the needsOBJ field is set to TRUE
- * ERROR: FALSE if the parameters are not valid
+ * OUT: true on success
+ *		false on failure
+ * POST: the needsOBJ field is set to true
+ * ERROR: false if the parameters are not valid
  */
 bool setNeedsOBJ(List* list, char* name) {
 	List* temp;
 
 	/* check parameters */
 	if (list == NULL || name == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	/* search for the element with the matching old name */
@@ -391,11 +391,11 @@ bool setNeedsOBJ(List* list, char* name) {
 
 	/* make sure that it didnt run off the end of the list */
 	if (temp == NULL) {
-		return FALSE;
+		return false;
 	}
 
-	temp->needsOBJ = TRUE;
-	return TRUE;
+	temp->needsOBJ = true;
+	return true;
 }
 
 /**
@@ -405,16 +405,16 @@ bool setNeedsOBJ(List* list, char* name) {
  * IN:	list, the list to search
  *		name, the name to search for
  * OUT: returns wether or not the element needs obj if it is found
- *		FALSE if it is not found
+ *		false if it is not found
  * POST: none
- * ERROR: FALSE if something goes wrong
+ * ERROR: false if something goes wrong
  */
 bool getNeedsOBJ(List* list, char* name) {
 	List* temp;
 
 	/* check that the parameters are valid */
 	if (list == NULL || name == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	/* search for the element with the matching old name */
@@ -425,7 +425,7 @@ bool getNeedsOBJ(List* list, char* name) {
 
 	/* make sure that it didnt run off the end of the list */
 	if (temp == NULL) {
-		return FALSE;
+		return false;
 	}
 
 	return temp->needsOBJ;

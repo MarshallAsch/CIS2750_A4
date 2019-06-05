@@ -24,25 +24,22 @@ then the values will be left blank.
 #include <stdlib.h>
 #include <string.h>
 #include "mystring.h"
-#include "myboolean.h"
+#include <stdbool.h>
 #include "fieldList.h"
 
 
-typedef enum Type
-{
+typedef enum Type {
 	key,
 	value
 } Type;
 
 
-typedef struct Param
-{
+typedef struct Param {
 	char* key;
 	char* value;
 } Param;
 
-typedef struct ParamList
-{
+typedef struct ParamList {
 	Param** list;
 	int length;
 } ParamList;

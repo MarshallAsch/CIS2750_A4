@@ -15,10 +15,10 @@ the list.
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <stdbool.h>
 
 #include "mystring.h"
-#include "myboolean.h"
+
 
 
 /**

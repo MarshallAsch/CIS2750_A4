@@ -20,6 +20,8 @@ See README for usage and restrictions for this program
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+
 
 /**
  * searchGlibal
@@ -506,7 +508,7 @@ void searchClass(Keyword* startClass, string className, Lists*  masterList, Keyw
 	}
 
 	/* do usage check here */
-	searchUsage(root, masterList->funcList, className, NULL, masterList->globalList, TRUE);
+	searchUsage(root, masterList->funcList, className, NULL, masterList->globalList, true);
 
 	new = newToken();
 
@@ -540,7 +542,7 @@ Keyword* modFunc(Keyword* startfunc, string className, Keyword** putName, Lists*
 	Keyword* new;
 	Keyword* temp;
 
-	bool hasClass;				/* TRUE if it uses any variables from the class (needs obj) */
+	bool hasClass;				/* true if it uses any variables from the class (needs obj) */
 	bool hasParam;
 
 	char* funcType;				/* free 		at end of function after func pinter added */
@@ -572,8 +574,8 @@ Keyword* modFunc(Keyword* startfunc, string className, Keyword** putName, Lists*
 
 	temp = startfunc;
 
-	hasClass = FALSE;
-	hasParam = FALSE;
+	hasClass = false;
+	hasParam = false;
 	numBrackets = 0;
 
 	/* bring forward to point at start of param list */
@@ -604,7 +606,7 @@ Keyword* modFunc(Keyword* startfunc, string className, Keyword** putName, Lists*
 				funcTypeList = join(funcTypeList, ", ");
 
 
-				hasParam = TRUE;
+				hasParam = true;
 			}
 			/* add the type to the name */
 			newName = join(newName, peramType);
@@ -668,7 +670,7 @@ Keyword* modFunc(Keyword* startfunc, string className, Keyword** putName, Lists*
 			changeToken(temp, name);
 			free(name);						/* malloc in loop free in loop */
 
-			hasClass = TRUE;
+			hasClass = true;
 		}
 		/* otherwise it is a global var */
 
@@ -681,14 +683,14 @@ Keyword* modFunc(Keyword* startfunc, string className, Keyword** putName, Lists*
 	}
 
 	/* add an new variable for the struct to the peram list */
-	if (hasClass == TRUE) {
+	if (hasClass == true) {
 		new = newToken();
 
 		name = strduplicate("struct ");
 		name = join(name, className);
 
 		/* if there are other perameters then use a comma after inserting the object */
-		if (hasParam == TRUE) {
+		if (hasParam == true) {
 			name = join(name, "* myOBJ, ");
 		} else {
 			name = join(name, "* myOBJ");
@@ -849,7 +851,7 @@ Keyword* searchUsage(Keyword* tok, List* funcList, char* className, List* parent
 				changeToken(new, constructorCall);
 
 				/* if it is in global scope then put the constructor into main */
-				if (isGlobal == TRUE) {
+				if (isGlobal == true) {
 					Keyword* startMain;
 					startMain = findMain(tok);
 
@@ -912,7 +914,7 @@ Keyword* searchUsage(Keyword* tok, List* funcList, char* className, List* parent
 						addParam = getNeedsOBJ(funcList, result);
 
 						/* insert the new &objName as first param to func*/
-						if (addParam == TRUE) {
+						if (addParam == true) {
 							name = strduplicate("&");
 							name = join(name, objName);
 
@@ -936,7 +938,7 @@ Keyword* searchUsage(Keyword* tok, List* funcList, char* className, List* parent
 
 		/* if it is the start of a new block  then recursivly branch into block */
 		else if (strcmp(tok->token, "{") == 0) {
-			tok = searchUsage(tok->next, funcList, className, objects, scopeVar, FALSE);
+			tok = searchUsage(tok->next, funcList, className, objects, scopeVar, false);
 			continue;
 		}
 		/* if reached the end of the block then exit this recurssive loop*/
@@ -951,7 +953,7 @@ Keyword* searchUsage(Keyword* tok, List* funcList, char* className, List* parent
 			/* then it is a normal variable declaration*/
 			if (paramType != NULL) {
 				if (strstr(tok->token, "struct") != NULL && strcmp(tok->next->token, "{") == 0) {
-					tok = searchUsage(tok->next->next, funcList, className, objects, scopeVar, FALSE);
+					tok = searchUsage(tok->next->next, funcList, className, objects, scopeVar, false);
 					free(paramType);
 					continue;
 				}
@@ -1063,10 +1065,10 @@ Keyword* loadFile(char* fileName) {
 	char temp;
 	char next;
 
-	bool space = FALSE;
-	bool string = FALSE;
-	bool blockComment = FALSE;
-	bool lineComment = FALSE;
+	bool space = false;
+	bool string = false;
+	bool blockComment = false;
+	bool lineComment = false;
 
 	Keyword* root = NULL;
 	Keyword* token = NULL;
@@ -1102,7 +1104,7 @@ Keyword* loadFile(char* fileName) {
 		case '\r':
 			if (lineComment) {
 				printWhite_char(token, temp);
-				lineComment = FALSE;
+				lineComment = false;
 				break;
 			}
 		case ' ':
@@ -1111,9 +1113,9 @@ Keyword* loadFile(char* fileName) {
 		case '\v':
 			if (string) {
 				printToken_char(token, temp);
-			} else if (lineComment == FALSE && blockComment == FALSE) {
+			} else if (lineComment == false && blockComment == false) {
 				printWhite_char(token, temp);
-				space = TRUE;
+				space = true;
 			} else {
 				printWhite_char(token, temp);
 			}
@@ -1143,8 +1145,8 @@ Keyword* loadFile(char* fileName) {
 				} else {
 					token = addToken(token, tmp_token);
 					tmp_token = NULL;
-					string = FALSE;
-					space = TRUE;
+					string = false;
+					space = true;
 					printToken_char(token, temp);
 				}
 			}
@@ -1152,7 +1154,7 @@ Keyword* loadFile(char* fileName) {
 		case '\"':
 			if (string) {
 				printToken_char(token, temp);
-				string = FALSE;
+				string = false;
 			} else if (!string && !(lineComment && blockComment)) {
 				tmp_token = newToken();
 				if (tmp_token == NULL) {
@@ -1162,7 +1164,7 @@ Keyword* loadFile(char* fileName) {
 				} else {
 					token = addToken(token, tmp_token);
 					tmp_token = NULL;
-					string = TRUE;
+					string = true;
 					printToken_char(token, temp);
 				}
 			} else if (lineComment || blockComment) {
@@ -1185,7 +1187,7 @@ Keyword* loadFile(char* fileName) {
 				if (next == '/') {
 					printWhite_char(token, temp);
 					printWhite_char(token, next);
-					blockComment = FALSE;
+					blockComment = false;
 				} else {
 					printWhite_char(token, temp);
 					ungetc(next, file);
@@ -1199,8 +1201,8 @@ Keyword* loadFile(char* fileName) {
 				} else {
 					token = addToken(token, tmp_token);
 					tmp_token = NULL;
-					string = FALSE;
-					space = TRUE;
+					string = false;
+					space = true;
 					printToken_char(token, temp);
 				}
 			}
@@ -1214,13 +1216,13 @@ Keyword* loadFile(char* fileName) {
 				next = fgetc(file);
 
 				if (next == '*') {
-					blockComment = TRUE;
-					space = FALSE;
+					blockComment = true;
+					space = false;
 					printWhite_char(token, temp);
 					printWhite_char(token, next);
 				} else if (next == '/') {
-					lineComment = TRUE;
-					space = TRUE;
+					lineComment = true;
+					space = true;
 					printWhite_char(token, temp);
 					printWhite_char(token, next);
 				} else {
@@ -1232,7 +1234,7 @@ Keyword* loadFile(char* fileName) {
 					} else {
 						token = addToken(token, tmp_token);
 						tmp_token = NULL;
-						space = TRUE;
+						space = true;
 						printToken_char(token, temp);
 						ungetc(next, file);
 					}
@@ -1254,7 +1256,7 @@ Keyword* loadFile(char* fileName) {
 				} else {
 					token = addToken(token, tmp_token);
 					tmp_token = NULL;
-					space = FALSE;
+					space = false;
 					printToken_char(token, temp);
 				}
 			} else {

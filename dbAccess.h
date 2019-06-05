@@ -10,7 +10,7 @@ Contains all the functions for accessing and manipulating the database
 #ifndef __DB_ACCESS_H__
 #define __DB_ACCESS_H__
 
-#include <mysql/mysql.h>
+#include <mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,33 +18,31 @@ Contains all the functions for accessing and manipulating the database
 
 
 #ifndef HOSTNAME
-#define HOSTNAME "dursley.socs.uoguelph.ca"
+#define HOSTNAME "localhost"
 #endif
 
 #ifndef USERNAME
-#define USERNAME "masch"
+#define USERNAME "cis2750"
 #endif
 
 #ifndef PASSWORD
-#define PASSWORD "0928357"
+#define PASSWORD "angleOfDeath"
 #endif
 
 #ifndef DATABASE
-#define DATABASE "masch"
+#define DATABASE "cis2750"
 #endif
 
 
 /* struct to hold the results of a query */
-typedef struct SQL_result
-{
+typedef struct SQL_result {
 	int numRows;
 	int numFields;
 	int current;
 	void** data;
 } SQL_result;
 
-typedef struct SQL_post_result
-{
+typedef struct SQL_post_result {
 	int id;
 	char* stream_name;
 	char* user_id;
@@ -52,16 +50,14 @@ typedef struct SQL_post_result
 	char* text;
 } SQL_post_result;
 
-typedef struct SQL_users_result
-{
+typedef struct SQL_users_result {
 	int id;
 	char* user_id;
 	char* stream_name;
 	int num_read;
 } SQL_users_result;
 
-typedef struct SQL_streams_result
-{
+typedef struct SQL_streams_result {
 	int id;
 	char* stream_name;
 	int num_posts;

@@ -13,7 +13,7 @@ Takes in 1 commandline argument which is the acction it will do.
 #ifndef __DB_H__
 #define __DB_H__
 
-#include <mysql/mysql.h>
+#include <mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

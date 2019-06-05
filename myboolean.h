@@ -10,19 +10,9 @@ A very basic boolean type
 #ifndef __MY_BOOLEAN_H__
 #define __MY_BOOLEAN_H__
 
-
-/* create boolean */
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
+#include <stdbool.h>
 
 #define TOGGLE(a) a = (a + 1) % 2
-
-typedef int bool;
 
 #endif
 

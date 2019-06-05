@@ -32,8 +32,8 @@ db_OBJ = $(addprefix $(OUT_DIR), $(patsubst %.c, %.o, $(db_SRC)))
 
 LIBS = -L$(LIB_DIR) -lmystr -lstream
 CC = gcc
-CFLAG =  -c -Wall -ansi -g -fPIC
-LFLAG = -lc -lm -lmysqlclient $(LIBS)
+CFLAG =  -c -Wall -std=c99 -g -fPIC -I/usr/local/mysql/include
+LFLAG = -lc -lm -L/usr/local/mysql/lib -lmysqlclient -lssl -lcrypto $(LIBS)
 
 
 EXE = db post addauthor genHTML auth removeauthor

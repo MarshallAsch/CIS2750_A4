@@ -1,9 +1,21 @@
-*.o
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-a.out
+
+build/**
+lib/**
+out/**
+*.so
+
+*.log
+
+# executables
+a1
+addauthor
+db
+genHTML
+post
+removeAuthor
+auth
+
+
+# generated source files
+post.c

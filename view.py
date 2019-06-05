@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 
 ################################ view.py ################################
 # Student Name: Marshall Aaron Asch            Student Number:  0928357

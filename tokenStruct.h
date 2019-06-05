@@ -17,7 +17,7 @@ The token also keeps track of how long its strings are.
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "myboolean.h"
+#include <stdbool.h>
 
 /**
  * 	length that gets added to the strings to make

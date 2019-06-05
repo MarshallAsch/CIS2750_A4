@@ -11,7 +11,7 @@ Takes in 1 commandline argument which is the acction it will do.
 ****************************************************************************/
 
 
-#include <mysql/mysql.h>
+#include <mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -52,15 +52,13 @@ static char parseOption(const char* option);
  * @return      -1 if there are not the correct number
  *               0 on success
  */
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 	MYSQL* mysql;
 
 
 
 	/* make sure the num arguments are correct */
-	if (argc != 2)
-	{
+	if (argc != 2) {
 		usage();
 		return -1;
 	}
@@ -68,8 +66,7 @@ int main(int argc, char const *argv[])
 	/* initilize connection to the database */
 	mysql = initSQL();
 
-	switch (parseOption(argv[1]))
-	{
+	switch (parseOption(argv[1])) {
 	case 'c':
 		clearAll(mysql);
 		break;
@@ -114,23 +111,20 @@ int main(int argc, char const *argv[])
  *               -3  failed to load the data
  *               0   on success
  */
-int printUsers(MYSQL* mysql)
-{
+int printUsers(MYSQL* mysql) {
 	char* query;
 
 	MYSQL_RES* results;
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
 	query = strduplicate("SELECT DISTINCT user_id FROM users");
 
-	if (mysql_query(mysql, query) != 0)
-	{
+	if (mysql_query(mysql, query) != 0) {
 		error("failed to select users.", mysql);
 		free(query);
 		return -2;
@@ -138,21 +132,18 @@ int printUsers(MYSQL* mysql)
 	free(query);
 
 	/* store the results of the query */
-	if (!(results = mysql_store_result(mysql)))
-	{
+	if (!(results = mysql_store_result(mysql))) {
 		error("failed to load the data.", mysql);
 		return -3;
 	}
 
 	/* print the userIDs */
-	while ((row = mysql_fetch_row(results)))
-	{
+	while ((row = mysql_fetch_row(results))) {
 		printf("%s\n", row[0]);
 	}
 
 	/* check if the table is empty */
-	if (mysql_num_rows(results) == 0)
-	{
+	if (mysql_num_rows(results) == 0) {
 		printf("table is empty.\n");
 	}
 
@@ -171,23 +162,20 @@ int printUsers(MYSQL* mysql)
  *               -3  failed to load the data
  *               0   on success
  */
-int printStreams(MYSQL* mysql)
-{
+int printStreams(MYSQL* mysql) {
 	char* query;
 
 	MYSQL_RES* results;
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
 	query = strduplicate("SELECT DISTINCT stream_name FROM streams");
 
-	if (mysql_query(mysql, query) != 0)
-	{
+	if (mysql_query(mysql, query) != 0) {
 		error("failed to select streams.", mysql);
 		free(query);
 		return -2;
@@ -195,21 +183,18 @@ int printStreams(MYSQL* mysql)
 	free(query);
 
 	/* store the results of the query */
-	if (!(results = mysql_store_result(mysql)))
-	{
+	if (!(results = mysql_store_result(mysql))) {
 		error("failed to load the data.", mysql);
 		return -3;
 	}
 
 	/* print the userIDs */
-	while ((row = mysql_fetch_row(results)))
-	{
+	while ((row = mysql_fetch_row(results))) {
 		printf("%s\n", row[0]);
 	}
 
 	/* check if the table is empty */
-	if (mysql_num_rows(results) == 0)
-	{
+	if (mysql_num_rows(results) == 0) {
 		printf("table is empty.\n");
 	}
 
@@ -234,23 +219,20 @@ int printStreams(MYSQL* mysql)
  *               -3  failed to load the data
  *                0  on success
  */
-int printposts(MYSQL* mysql)
-{
+int printposts(MYSQL* mysql) {
 	char* query;
 
 	MYSQL_RES* results;
 	MYSQL_ROW  row;
 
 	/* make sure parameters are valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
 	query = strduplicate("SELECT stream_name,user_id,date,text FROM posts");
 
-	if (mysql_query(mysql, query) != 0)
-	{
+	if (mysql_query(mysql, query) != 0) {
 		error("failed to select posts.", mysql);
 		free(query);
 		return -2;
@@ -259,15 +241,13 @@ int printposts(MYSQL* mysql)
 
 
 	/* store the results of the query */
-	if (!(results = mysql_store_result(mysql)))
-	{
+	if (!(results = mysql_store_result(mysql))) {
 		error("failed to load the data.", mysql);
 		return -3;
 	}
 
 	/* print the userIDs */
-	while ((row = mysql_fetch_row(results)))
-	{
+	while ((row = mysql_fetch_row(results))) {
 
 		printf("stream: %s\n", row[0]);
 		printf("userID: %s\n", row[1]);
@@ -277,8 +257,7 @@ int printposts(MYSQL* mysql)
 	}
 
 	/* check if the table is empty */
-	if (mysql_num_rows(results) == 0)
-	{
+	if (mysql_num_rows(results) == 0) {
 		printf("table is empty.\n");
 	}
 
@@ -294,11 +273,9 @@ int printposts(MYSQL* mysql)
  * @return       -1  invalid param
  *                0  on success
  */
-int clearAll(MYSQL* mysql)
-{
+int clearAll(MYSQL* mysql) {
 	/* make sure the parameters is valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
@@ -318,11 +295,9 @@ int clearAll(MYSQL* mysql)
  * @return       -1  invalid param
  *                0  on success
  */
-int deleteAll(MYSQL* mysql)
-{
+int deleteAll(MYSQL* mysql) {
 	/* make sure the parameters is valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
@@ -358,12 +333,10 @@ int deleteAll(MYSQL* mysql)
  * @return       -1  invalid param
  *                0  on success
  */
-int createAllTables(MYSQL* mysql)
-{
+int createAllTables(MYSQL* mysql) {
 	int status;
 	/* make sure the parameters is valid */
-	if (mysql == NULL)
-	{
+	if (mysql == NULL) {
 		return -1;
 	}
 
@@ -379,22 +352,19 @@ int createAllTables(MYSQL* mysql)
 
 	/* try to create the users table */
 	status = createTable_DB(mysql, "users", 3, namesUsers, typesUsers);
-	if (status != 0)
-	{
+	if (status != 0) {
 		printf("Failed to create the users table.\n");
 	}
 
 	/* try to create the posts table */
 	status = createTable_DB(mysql, "posts", 4, namesPosts, typesPosts);
-	if (status != 0)
-	{
+	if (status != 0) {
 		printf("Failed to create the posts table.\n");
 	}
 
 	/* try to create the streams table */
 	status = createTable_DB(mysql, "streams", 2, namesStreams, typesStreams);
-	if (status != 0)
-	{
+	if (status != 0) {
 		printf("Failed to create the streams table.\n");
 	}
 
@@ -406,8 +376,7 @@ int createAllTables(MYSQL* mysql)
  * usage
  * Prints the usage message for this program
  */
-static void usage()
-{
+static void usage() {
 	printf("Usage: ./db\nuse to access the database\n");
 	printf("  -clear : removes all of the posts, users, streams from the tables in the database\n");
 	printf("  -reset : deletes the tables from the database\n");
@@ -432,41 +401,32 @@ static void usage()
  *         i		initilize
  *         o		unknown option
  */
-static char parseOption(const char* option)
-{
+static char parseOption(const char* option) {
 	/* make sure an option is given */
-	if (option == NULL)
-	{
+	if (option == NULL) {
 		return 'o';
 	}
 
-	if (strcmp_nocase(option, "-clear") == 0)
-	{
+	if (strcmp_nocase(option, "-clear") == 0) {
 		return 'c';
 	}
 
-	if (strcmp_nocase(option, "-reset") == 0)
-	{
+	if (strcmp_nocase(option, "-reset") == 0) {
 		return 'r';
 	}
-	if (strcmp_nocase(option, "-posts") == 0)
-	{
+	if (strcmp_nocase(option, "-posts") == 0) {
 		return 'p';
 	}
-	if (strcmp_nocase(option, "-users") == 0)
-	{
+	if (strcmp_nocase(option, "-users") == 0) {
 		return 'u';
 	}
-	if (strcmp_nocase(option, "-streams") == 0)
-	{
+	if (strcmp_nocase(option, "-streams") == 0) {
 		return 's';
 	}
-	if (strcmp_nocase(option, "-help") == 0)
-	{
+	if (strcmp_nocase(option, "-help") == 0) {
 		return 'h';
 	}
-	if (strcmp_nocase(option, "-init") == 0)
-	{
+	if (strcmp_nocase(option, "-init") == 0) {
 		return 'i';
 	}
 
